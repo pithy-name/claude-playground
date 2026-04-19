@@ -1,6 +1,6 @@
 ---
 name: session-journal
-description: Apply at the start of every session, at meaningful milestones during the session, and at the end of every session. Creates and maintains a journal entry file per session documenting goals, progress, decisions, and outcomes.
+description: This skill should be used at the start of every session, at meaningful milestones during the session, and at the end of every session. Creates and maintains a journal entry file per session documenting goals, progress, decisions, and outcomes.
 user-invocable: false
 ---
 
@@ -31,7 +31,7 @@ A milestone represents something completed or delivered — a skill created, a f
 ```markdown
 # Session Journal — YYYY-MM-DD HH:MM
 
-**Repo:** <working directory>
+**Repo:** owner/repo (last two path segments of the working directory — never the full absolute path)
 **Started:** YYYY-MM-DD HH:MM (local 24h)
 **Ended:** YYYY-MM-DD HH:MM (fill in at close)
 
