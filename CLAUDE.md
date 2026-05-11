@@ -18,6 +18,7 @@ Skills live in `.claude/skills/<skill-name>/SKILL.md`. Each file has a YAML fron
 **Active skills:**
 - `gitignore-init` — automatic; runs on first repo exploration; creates `.gitignore` if absent, then delegates to `gitignore-checker`
 - `gitignore-checker` — automatic; runs whenever a `.gitignore` is read/created/edited; ensures `.DS_Store` and `.env` entries are present
+- `meetgeek-to-md` — user-invocable; converts MeetGeek DOCX transcript exports to clean markdown
 
 ## Adding a new skill
 
