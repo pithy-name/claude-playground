@@ -16,6 +16,7 @@ Skills live in `.claude/skills/<skill-name>/SKILL.md`. Each file contains a fron
 |-------|-------------|
 | `gitignore-init` | Automatic. When first exploring a repo, checks if a `.gitignore` exists and creates one if not. |
 | `gitignore-checker` | Automatic. Whenever a `.gitignore` is read, created, or edited, ensures `.DS_Store` and `.env` are present. |
+| `meetgeek-to-md` | User-invocable (`/meetgeek-to-md <path-to-docx>`). Converts a MeetGeek DOCX transcript export to a clean markdown file with corrected speaker attribution, agenda, and Key Takeaways. |
 
 ## Adding a new skill
 
