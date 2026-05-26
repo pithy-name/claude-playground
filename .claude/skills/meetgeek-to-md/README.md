@@ -2,6 +2,22 @@
 
 Converts a MeetGeek DOCX transcript export into a clean, readable markdown file. This is a Claude Code skill — invoking it via `/meetgeek-to-md` runs a multi-step automated process defined in [SKILL.md](SKILL.md).
 
+**Caveat emptor**
+> **Status:** v0.1
+> **Works with:** MeetGeek DOCX exports only
+> **Key Takeaways are AI-generated** — not extracted verbatim from the transcript
+> **Attribution is best-effort** — verify against source audio for high-stakes records
+
+---
+
+## The problem this solves
+
+MeetGeek's voice detection frequently splits sentences mid-word and misattributes fragments to the wrong speaker. The raw export is technically complete but often unreadable — a single coherent thought can be split across multiple "speakers," none of them the person who actually said it.
+
+This skill reconstructs correct attribution using grammatical continuity, first-person context, and semantic coherence. Every low-confidence override is flagged with a `<!-- CHECK -->` comment for your review (see [Inline annotations](#inline-annotations)). Every ASR word correction is flagged too — no silent edits.
+
+---
+
 ## Usage
 
 ```
@@ -31,12 +47,6 @@ This skill expects a `.docx` file exported directly from MeetGeek's transcript f
 5. The entire transcript as one long run-on paragraph, with speaker names and timestamps embedded inline
 
 **Do not run this skill on other DOCX files** (homework documents, reference files, etc.) — the extraction logic assumes the MeetGeek format and will produce incorrect output on anything else.
-
-### Known MeetGeek quirk: speaker misattribution
-
-MeetGeek's voice detection frequently splits sentences mid-word and attributes fragments to the wrong speaker. This skill applies heuristics to reconstruct correct attribution — grammatical continuity, first-person context, and semantic coherence all take precedence over the raw speaker labels.
-
-When attribution is genuinely ambiguous, the skill adds an inline `<!-- CHECK -->` comment so you can review it (see [Inline annotations](#inline-annotations) below).
 
 ### What if sections are missing?
 
@@ -99,6 +109,7 @@ After saving, the skill will surface all flagged items for your review and remov
 
 ## Future improvements
 
-- **Format flexibility:** V1 assumes MeetGeek's exact 5-line DOCX structure. Future versions should detect and adapt to variations in export format (different MeetGeek versions, other meeting tools with similar output).
+- **Format flexibility:** v0.1 assumes MeetGeek's exact 5-line DOCX structure. Future versions should detect and adapt to variations in export format (different MeetGeek versions, other meeting tools with similar output).
 - **Partial structure handling:** gracefully skip or infer missing sections rather than failing silently.
 - **Rename "Metadata" section:** the output currently uses "Metadata" as the section header for meeting details — inherited from MeetGeek's own label. This is ambiguous; a clearer name (e.g. "Meeting Details") would improve readability.
+- **Evals:** a test suite for attribution reconstruction is in development.
