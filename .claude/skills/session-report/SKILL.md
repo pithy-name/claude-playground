@@ -5,7 +5,9 @@ description: Generate an explorable HTML report of Claude Code session usage (to
 
 # Session Report
 
-Produce a self-contained HTML report of Claude Code usage and save it to `<your-output-dir>`.
+Produce a self-contained HTML report of Claude Code usage.
+
+**Output directory:** Use the path the user passed as an argument (e.g. `/session-report ~/reports`). If no argument was given, ask: "Where should I save the report?"
 
 ## Steps
 
