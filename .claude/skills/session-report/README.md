@@ -4,6 +4,7 @@
 > **Status:** v0.1 — experimental
 > **Requires:** the `session-report` plugin from the Claude plugins marketplace
 > **Output path:** pass a directory at invocation time, or hardcode one in `SKILL.md`
+> **Playground experiment** — built for personal use; not a general recommendation
 
 ---
 
