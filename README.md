@@ -1,25 +1,12 @@
 # claude-playground
 
-A personal sandbox for exploring Claude Code and keeping technical skills sharp.
+A personal sandbox for building with [Claude Code](https://claude.ai/code).
 
-## What's here
+## Skills
 
-Experiments with Claude Code features.
-
-## How skills work
-
-Skills live in `.claude/skills/<skill-name>/SKILL.md`. Each file contains a frontmatter header (name, description, trigger behavior) and instructions Claude follows when the skill is invoked. Skills can be user-invocable (called with `/skill-name`) or automatic (triggered by context).
-
-## Skills in this repo
-
-| Skill | Description |
-|-------|-------------|
-| `gitignore-init` | Automatic. When first exploring a repo, checks if a `.gitignore` exists and creates one if not. |
-| `gitignore-checker` | Automatic. Whenever a `.gitignore` is read, created, or edited, ensures `.DS_Store` and `.env` are present. |
-| `meetgeek-to-md` | User-invocable (`/meetgeek-to-md <path-to-docx>`). Converts a MeetGeek DOCX transcript export to a clean markdown file with corrected speaker attribution, agenda, and Key Takeaways. |
-
-## Adding a new skill
-
-1. Create a folder under `.claude/skills/<your-skill-name>/`
-2. Add a `SKILL.md` with frontmatter and instructions
-3. Claude Code will pick it up automatically
+| Skill | Invocation | Maturity | Description |
+|-------|------------|----------|-------------|
+| [`gitignore-init`](.claude/skills/gitignore-init/) | Automatic | v0.1 | Creates a `.gitignore` if none exists when first exploring a repo. |
+| [`gitignore-checker`](.claude/skills/gitignore-checker/) | Automatic | v0.1 | Ensures `.DS_Store` and `.env` are in every `.gitignore`, silently. |
+| [`meetgeek-to-md`](.claude/skills/meetgeek-to-md/) | `/meetgeek-to-md <path>` | v0.1 | Converts a MeetGeek DOCX transcript to clean markdown with corrected speaker attribution and Key Takeaways. |
+| [`session-report`](.claude/skills/session-report/) | `/session-report` | 🧪 experimental | Project-scoped override of the `session-report` plugin — redirects output to a configurable directory. Playground experiment. |
