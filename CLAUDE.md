@@ -13,6 +13,10 @@ A personal sandbox for exploring Claude Code features — primarily skills and a
 - `meetgeek-to-md` — user-invocable; converts MeetGeek DOCX transcript exports to clean markdown
 - `session-report` — user-invocable; project-scoped override of the session-report plugin
 
+## Tools
+
+- `tools/` — standalone HTML tools, each in its own subdirectory. For any third-party tool, retain the upstream LICENSE in its subdirectory and verify license compliance before committing.
+
 ## Privacy rules
 
 This is a public repo. All files must be free of PII and absolute paths.
