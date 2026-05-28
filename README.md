@@ -15,4 +15,4 @@ A personal sandbox for building with [Claude Code](https://claude.ai/code).
 
 - `gitignore-init` and `gitignore-checker` are implemented as skills but would be better as hooks — deterministic file operations shouldn't depend on Claude following instructions. Planned migration.
 - Evals for `meetgeek-to-md`
-- Scratchpad skill for session documentation
+- Session Log skill for documentation
