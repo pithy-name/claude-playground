@@ -12,10 +12,21 @@ A personal sandbox for exploring Claude Code features — primarily skills and a
 - `gitignore-checker` — automatic; runs whenever a `.gitignore` is read/created/edited; ensures `.DS_Store` and `.env` entries are present
 - `meetgeek-to-md` — user-invocable; converts MeetGeek DOCX transcript exports to clean markdown
 - `session-report` — user-invocable; project-scoped override of the session-report plugin
+- `session-journal` — automatic; 🧪 experimental, superseded by the Session logs workflow below; creates per-session journal entries
 
 ## Tools
 
 - `tools/` — standalone HTML tools, each in its own subdirectory. For any third-party tool, retain the upstream LICENSE in its subdirectory and verify license compliance before committing.
+
+## Session logs
+
+Session logs / scratchpads live at `.claude/session-logs/` (not the global default `scratchpads/`). Gitignored.
+
+## Workflow
+
+- Single-responsibility branches (one logical change per branch/PR)
+- Squash merge to `main`
+- Always ask before committing or pushing (no auto-chain)
 
 ## Privacy rules
 
