@@ -1,3 +1,4 @@
 .DS_Store
 .env
-.claude/journals
+.claude/session-logs
+side quests/

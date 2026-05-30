@@ -12,6 +12,12 @@ A personal sandbox for building with [Claude Code](https://claude.ai/code).
 | [`session-report`](.claude/skills/session-report/) | `/session-report` | 🧪 experimental | Project-scoped override of the `session-report` plugin — redirects output to a configurable directory. Playground experiment. |
 | [`session-journal`](.claude/skills/session-journal/) | Automatic | 🧪 experimental | Creates and maintains a per-session journal entry in `.claude/journals/`. Not actively maintained. |
 
+## Tools
+
+| Tool | Description |
+|------|-------------|
+| [`claude-code-timeline`](tools/claude-code-timeline/) | Interactive timeline viewer for Claude Code session `.jsonl` transcripts. Download and open locally — no server needed. Source: simonw/tools (Apache-2.0). |
+
 ## Roadmap
 
 - `gitignore-init` and `gitignore-checker` are implemented as skills but would be better as hooks — deterministic file operations shouldn't depend on Claude following instructions. Planned migration.
