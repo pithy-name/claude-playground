@@ -27,6 +27,7 @@ Session logs live at `.claude/session-logs/` (the project's term for what the gl
 - Single-responsibility branches (one logical change per branch/PR)
 - Squash merge to `main`
 - Always ask before committing or pushing (no auto-chain)
+- Backlog and planned work live in `TODO.md` at the repo root
 
 ## Privacy rules
 
