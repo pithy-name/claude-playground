@@ -17,9 +17,3 @@ A personal sandbox for building with [Claude Code](https://claude.ai/code).
 | Tool | Description |
 |------|-------------|
 | [`claude-code-timeline`](tools/claude-code-timeline/) | Interactive timeline viewer for Claude Code session `.jsonl` transcripts. Download and open locally — no server needed. Source: simonw/tools (Apache-2.0). |
-
-## Roadmap
-
-- `gitignore-init` and `gitignore-checker` are implemented as skills but would be better as hooks — deterministic file operations shouldn't depend on Claude following instructions. Planned migration.
-- Evals for `meetgeek-to-md`
-- Session Log skill for documentation
