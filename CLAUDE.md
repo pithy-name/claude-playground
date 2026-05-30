@@ -20,7 +20,7 @@ A personal sandbox for exploring Claude Code features — primarily skills and a
 
 ## Session logs
 
-Session logs / scratchpads live at `.claude/session-logs/` (not the global default `scratchpads/`). Gitignored.
+Session logs live at `.claude/session-logs/` (the project's term for what the global default calls "scratchpads"). Gitignored.
 
 ## Workflow
 
