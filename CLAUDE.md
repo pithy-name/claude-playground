@@ -18,6 +18,10 @@ A personal sandbox for exploring Claude Code features — primarily skills and a
 
 - `tools/` — standalone HTML tools, each in its own subdirectory. For any third-party tool, retain the upstream LICENSE in its subdirectory and verify license compliance before committing.
 
+## Plans
+
+Design specs for in-progress work live in `plans/` at the repo root, named `YYYY-MM-DD-<topic>-design.md`. A plan is reviewed and approved before the work it describes is built.
+
 ## Session logs
 
 Session logs live at `.claude/session-logs/` (the project's term for what the global default calls "scratchpads"). Gitignored.
