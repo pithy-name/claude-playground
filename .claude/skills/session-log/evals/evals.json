@@ -1,0 +1,48 @@
+{
+  "skill_name": "session-log",
+  "notes": "Test prompts for the session-log skill. Run with-skill vs baseline (no skill) subagents, then review in the eval viewer. Assertions are mostly programmatic — most can be checked by running scripts/parse_session_log.py over the produced log and grepping for required structure.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "create-log",
+      "prompt": "Start a session log for today — I'm refactoring the auth module and want to track decisions as we go.",
+      "expected_output": "A new file at .claude/session-logs/YYYY-MM-DD-<topic>.md with all required sections present, a one-line Goal, dated by session start.",
+      "files": [],
+      "assertions": [
+        {"text": "A session log file is created under .claude/session-logs/ named YYYY-MM-DD-<topic>.md"},
+        {"text": "parse_session_log.py exits 0 on the created file (conforming)"},
+        {"text": "All 7 required sections are present in the canonical order"},
+        {"text": "A non-empty **Goal:** line is present and reflects the auth refactor"},
+        {"text": "The filename date matches the session start date"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "incremental-update",
+      "prompt": "We just decided to use JWT over server-side sessions, and I caught a bug where the token expiry check used < instead of <=. Update the session log.",
+      "expected_output": "A Decisions & trade-offs entry for JWT-vs-sessions (bold heading, alternatives before choice, implication); a Mistakes & corrections entry with the bold Symptom/Root cause/Correct approach triplet; an appended timestamped Update block. Thematic content not duplicated into the Update block.",
+      "files": [],
+      "assertions": [
+        {"text": "A Decisions entry has a bold heading and lists the alternative (server-side sessions) before the choice (JWT)"},
+        {"text": "A Mistakes entry uses all three bold labels: **Symptom:** / **Root cause:** / **Correct approach:**"},
+        {"text": "A new ## Update YYYY-MM-DDTHH:MM TZ block is appended in the canonical timestamp format"},
+        {"text": "The Update block notes the events but does NOT restate the full decision/mistake prose (no thematic duplication)"},
+        {"text": "parse_session_log.py still exits 0 after the update"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "close-audit",
+      "prompt": "Last call — wrap up the session log, I'm done for the day.",
+      "expected_output": "A close-out pass: completed todos struck through (not deleted), a final timestamped Update block, a 'Where to pick up' footer, and a stale-claim audit. No duplicate timestamp blocks.",
+      "files": [],
+      "assertions": [
+        {"text": "Completed to-do items are struck through with ~~...~~ rather than deleted"},
+        {"text": "A final ## Update block is appended for the last batch of actions"},
+        {"text": "A non-empty 'Where to pick up' section is present"},
+        {"text": "No duplicate Update timestamp blocks exist"},
+        {"text": "parse_session_log.py exits 0 on the final log"}
+      ]
+    }
+  ]
+}
