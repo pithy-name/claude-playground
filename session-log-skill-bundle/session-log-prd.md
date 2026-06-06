@@ -66,13 +66,17 @@ Adopt **Session Log** as the canonical term. Cascade (mechanical, but touches ma
 
 ## 5. Structure: thematic + timeline base, with selected `session-journal` ideas
 
-**Base = current model** (full detail in `plans/session-log-skill-spec.md`): living thematic sections at top (What happened, Decisions & trade-offs, Mistakes & corrections, Learnings about the user) + chronological timestamped Update blocks + To-do at bottom. Purpose: an executive **TL;DR alternative to reading the whole transcript** — posterity + post-mortems.
+**Base = current model** (full detail in `plans/session-log-skill-spec.md`): living thematic sections at top (What happened, Decisions & trade-offs, Mistakes & corrections, What worked & what to repeat, Learnings about the user) + chronological timestamped Update blocks + To-do at bottom. Purpose: an executive **TL;DR alternative to reading the whole transcript** — posterity + post-mortems.
 
 **Folded in from `session-journal` (kept):**
 1. **Goal line in the header.** Brief "what we set out to do this session" at the top. Cheap, improves the posterity TL;DR.
 2. **Implication, not bare fact.** Decision/update entries must state the *implication* of a choice, not just the fact ("set `user-invocable: false` *so it fires automatically*"). Sharpens entries for future readers.
 3. **Privacy framing for repo identity.** Reference the repo as `owner/repo` or relative path — never the full absolute path. (Also satisfies §7.4.)
-4. **Consolidated "Files changed this session"** at close — a single list, complementing the per-Update memory-write logging.
+4. ~~**Consolidated "Files changed this session"** at close — a single list, complementing the per-Update memory-write logging.~~ *(cut 2026-06-04 — redundant with `git diff --stat` + the Update-block file entries + the Memory-writes log; inventory, not retro insight.)*
+
+**Revised 2026-06-04 (spec sync):**
+5. **"What worked & what to repeat" section** added as the positive counterpart to "Mistakes & corrections" — a retro must capture wins (the mechanism + whether to repeat, payoff quantified when estimable), not only failures. Drove the base-model list update above.
+6. **Update blocks capture the work *between* artifacts** — research/investigation and the prep that led to a milestone (the path, not only the milestone itself), enabling pacing analysis. Previously the Update "Use for:" list was output-only.
 
 ---
 

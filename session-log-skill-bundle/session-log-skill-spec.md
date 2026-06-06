@@ -38,7 +38,7 @@ Reliably enforce Session Log structure and update behavior. Prose instructions a
 ### Philosophy (what a Session Log is for)
 
 - **Posterity record with an executive top.** Substitutes for reading the whole transcript: what was accomplished and learned by session end (takeaways and FTRs). The **top** (Goal + What happened + Final state) is the quick executive read; the sections below are supporting depth. Length scales with the session — it is **not** capped to one page. Also used for **post-mortems**.
-- **Top half = summary of the whole session:** the What-happened list, decisions + trade-offs, technical/misc learnings, mistakes + corrections (a mistake *is* a learning), learnings about the user.
+- **Top half = summary of the whole session:** the What-happened list, decisions + trade-offs, technical/misc learnings, mistakes + corrections (a mistake *is* a learning), what worked + what to repeat (the positive counterpart — a retro learns from both), learnings about the user.
 - **Mistakes/corrections/learnings should be reusable to improve future processes.** Exact extraction mechanism is TBD.
 - **Decision log shows the FINAL decision**, not a version later changed. The chronological Update blocks capture each decision at the time it was made (and when it changed) — top reflects the end state, timeline reflects the evolution.
 
@@ -69,9 +69,9 @@ When invoked, guide Claude to correctly create or update a Session Log: (1) crea
 
 ## Mistakes & corrections
 
-## Learnings about the user
+## What worked & what to repeat
 
-## Files changed this session
+## Learnings about the user
 
 ## Where to pick up
 
@@ -122,6 +122,21 @@ Process failures named with Symptom / Root cause / Correct approach. A mistake i
   **Correct approach:** Use Edit, additive only; read before writing.
   ```
 
+#### What worked & what to repeat
+Wins, effective approaches, and good calls worth repeating — the positive counterpart to Mistakes. *Why:* a retro needs both sides. A log that only records failures teaches what to *stop*, never what to *keep doing*; capturing what worked (and the mechanism behind it) turns successful patterns into reusable practice instead of luck.
+
+- Name the win + **why it worked** (the underlying mechanism, not just "it went well") + whether it's worth repeating or promoting to a durable practice
+- Anchor in observable reality where possible — what specifically succeeded and the signal it worked
+- Capture process wins, not just task wins — an effective workflow or sequence is itself reusable
+- Where a path was chosen over an alternative, **quantify the payoff when estimable** — time/effort saved, rework avoided — sized case-by-case to the context and the path actually taken, not a fixed figure
+- Examples:
+  ```
+  **Worktree before editing a cross-branch spec:** spun an isolated git worktree instead of switching branches in a shared working tree. Why it worked: zero collision with the parallel session sharing the tree. Repeat for any cross-branch edit while another session is live.
+  ```
+  ```
+  **Build-vs-buy → reuse:** scouted for prior work before building and found the skill already designed — PRD, format spec, and a dedicated branch. Reused that instead of rebuilding from scratch. Why it worked: a short investigation pass surfaced finished prior work. Payoff: ~15h of redesign avoided. Repeat: always scout for existing work/tools before building.
+  ```
+
 #### Learnings about the user
 Preferences, patterns, and style observed during the session, each tagged with the observable signal that revealed it. *Why:* generic observations ("user values existing work") are too vague to act on; specific signals + behavioral implications are what future Claude sessions can actually use.
 
@@ -132,12 +147,6 @@ Preferences, patterns, and style observed during the session, each tagged with t
   ```
   Values existing work — "perfectly good and fine" signals satisfaction before a redirect; don't overwrite approved content
   ```
-
-#### Files changed this session
-A single consolidated list refreshed at close — at-a-glance summary of what was touched. *Why:* complements the per-Update memory-write logging (which is incremental); this is the scan-the-impact view, so a reader doesn't have to comb the Update blocks to know what moved.
-
-- Relative paths; one brief note per file (created / revised / superseded).
-- Refreshed at close so it reflects the final state.
 
 #### Where to pick up
 A footer pointing future-self at canonical sources first. *Why:* zero re-acquaint friction on return — the next session (or future Claude) shouldn't have to re-read the whole log to know where to start.
@@ -155,7 +164,7 @@ Format:
 
 - 24-hour clock, local timezone; timestamps **accurate, not guessed**
 - Append in chronological order
-- Use for: files written, memory saved, CLAUDE.md modified, todos crossed off, significant findings, decisions made/changed (with the time)
+- Use for: files written, memory saved, CLAUDE.md modified, todos crossed off, significant findings, decisions made/changed (with the time), research/investigation conducted, and the exploration or prep work that led to a milestone (the path to it, not only the milestone itself) — so the timeline shows the effort *between* artifacts, enabling pacing analysis
 - Do NOT duplicate thematic content here — decisions go in Decisions, not in an Update block
 - Capture To-do completion here
 
@@ -224,7 +233,7 @@ When the user signals close ("last call", "closing", "anything else?"), audit be
 - [ ] Final timestamped `## Update` block written for this session's last batch of actions
 - [ ] decisions.md promotion reviewed (only if the project has one)
 - [ ] No duplicate timestamp blocks
-- [ ] "Files changed this session" list consolidated
+- [ ] Every "What worked" entry names why it worked + whether to repeat (payoff quantified where estimable)
 - [ ] "Where to pick up" footer written
 - [ ] **Stale-claim audit** — re-verify carry-forward claims that may have become false during the session (e.g., "X file still on disk", "Y dir still empty"). Quick `ls`/`cat` to confirm reality before close. Carry-forward assumptions are a known source of session-close drift.
 
@@ -248,12 +257,11 @@ A minimal Session Log showing the shape (path-agnostic, no PII):
 **Root cause:** Edited path in one place, not the caller.
 **Correct approach:** grep for references before moving a file.
 
+## What worked & what to repeat
+**Grep-before-move, once adopted:** after the first slip, grepping for references ahead of each move caught two more stale imports. Why it worked: surfaced callers the editor didn't show. Repeat for every file move.
+
 ## Learnings about the user
 Wants verification before "done" — asked "did you actually run it?" after a claim. Run it, then report.
-
-## Files changed this session
-- `tools/find-files/find_files.py` — moved in
-- `tools/find-files/README.md` — created
 
 ## Where to pick up
 Next: add tests for `find_files.py`. Reference: `tools/find-files/README.md`.
@@ -309,9 +317,9 @@ Parked ideas — do NOT build in v1, but don't foreclose them either. Recorded s
 ## Rules this skill enforces (always-on summary)
 
 - Filename dated by session start; never overwrite
-- Required sections in order (Goal header → What happened → Decisions → Mistakes → Learnings → Files changed this session → Where to pick up → Update blocks → To-do), with depth guidance (Decisions: named headings + alternatives + implication; Mistakes: bold Symptom/Root cause/Correct approach triplet + meta-failures; Learnings: observable signal + actionable + specific)
+- Required sections in order (Goal header → What happened → Decisions → Mistakes → What worked & what to repeat → Learnings → Where to pick up → Update blocks → To-do), with depth guidance (Decisions: named headings + alternatives + implication; Mistakes: bold Symptom/Root cause/Correct approach triplet + meta-failures; What worked: win + why it worked + repeat?, quantify payoff when estimable; Learnings: observable signal + actionable + specific)
 - Thematic sections are living reference sections — edit in-place; refresh "What happened" at close for the full arc
-- Timestamped Update blocks are an append-only, chronological activity log — not for thematic content; accurate timestamps, never guessed; sit immediately above To-do
+- Timestamped Update blocks are an append-only, chronological activity log — capture the work *between* artifacts (research, investigation, prep that led to a milestone), not only the outputs; not for thematic content; accurate timestamps, never guessed; sit immediately above To-do
 - Decision revision: top reflects final choice; strikethrough old entry + add new with inline timestamp; timeline logs both
 - Strikethrough for completed todos (never delete)
 - decisions.md promotion at close (only if the project has one)
