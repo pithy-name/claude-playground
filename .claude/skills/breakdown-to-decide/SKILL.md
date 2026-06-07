@@ -8,7 +8,7 @@ user-invocable: true
 
 Turn a pile of decisions into a calm, one-at-a-time walk. For each decision you present a short structured writeup and then capture the user's choice with `AskUserQuestion`. This replaces the ad-hoc pattern of dumping a wall of findings and asking the user to react to all of them at once — which is exactly when people freeze or rubber-stamp.
 
-The canonical definition of the decision contract below lives in the design spec (`plans/2026-06-01-breakdown-to-decide-design.md`) and the skill's `README.md`. This file restates it as behavioral instruction; if they ever disagree, the spec/README is the source of truth.
+The decision contract below is this skill's own, self-contained definition — follow it as written. (The skill's `README.md`, which travels in this directory, mirrors it for human readers.)
 
 ## What counts as a "decision"
 

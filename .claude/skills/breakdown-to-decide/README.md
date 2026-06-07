@@ -2,7 +2,7 @@
 
 Walk through a pile of decisions **one at a time** instead of all at once. For each decision, Claude presents a short structured choice and captures your pick with the `AskUserQuestion` widget. It replaces the ad-hoc pattern of dumping a wall of findings and asking you to react to everything at once — which is exactly when people freeze or rubber-stamp.
 
-This directory is the **canonical home of the decision contract** below. The `SKILL.md` restates it as behavioral instruction and the hook encodes only its segment *keys*; if they ever disagree, this file (and the design spec) win.
+This directory is the **canonical, self-contained home of the decision contract** below — the skill carries everything it needs to run. The `SKILL.md` states it as behavioral instruction and the hook encodes only its segment *keys*; if they ever disagree, this file wins.
 
 ## The decision contract
 
@@ -80,12 +80,14 @@ Deliberately out of the MVP; add modularly if real usage calls for it:
 - **>4 options** — ranking rule + overflow UX (the widget caps at 4).
 - **Large-N UX** — an optional fast bulk-triage pass vs. a threshold warning.
 - **Findings-set confirmation** — enumerate + confirm when prior-context findings are ambiguous.
-- **Subagent scope** — verify whether `PreToolUse` fires inside subagent tool calls.
+- **Subagent scope** — note: `AskUserQuestion` itself is unavailable inside subagents (observed during eval runs), so the skill/hook don't apply there; revisit only if that changes.
 
 ## Development
+
+The runtime skill is self-contained: `SKILL.md` + `README.md` + `hook/`. The items below support *developing* the skill and live in its source repo (`pithy-name/claude-playground`); they are not required for the skill to run, and the last two are not bundled in a published copy.
 
 - `evals/evals.json` — eval prompts (5 cases across code findings, stack decomposition, multi-select, under-specified, and a design-spec review).
 - `evals/grading_criteria.md` — the iteration-2 grading spec (objective checks + an LLM judge on completeness/content/sequencing).
 - `evals/objective_checks.py` — deterministic O1/O2 checks.
-- Eval run outputs live in a sibling `breakdown-to-decide-workspace/` (git-ignored scratch).
-- Design spec: `plans/2026-06-01-breakdown-to-decide-design.md`.
+- Eval run outputs live in a sibling `breakdown-to-decide-workspace/` (git-ignored scratch; *not bundled*).
+- Design spec (source repo only, *not bundled*): `plans/2026-06-01-breakdown-to-decide-design.md`.
