@@ -26,11 +26,13 @@ Two non-obvious rules the skill follows: **decompose completely** (surface the f
 - Invoke explicitly: `/breakdown-to-decide`.
 - It also auto-triggers when you're facing a pile of choices — e.g. after a review/audit produces findings, or when you say "walk me through these," "break it down for me," "help me understand my options," "I don't know where to start," "how do I choose."
 
+Independent decisions are presented together in a **single `AskUserQuestion` card** (up to 4 at a time) that you navigate with prev/next and one summary Submit; a decision that depends on an earlier answer is asked on its own first. More than four decisions are chunked into successive cards.
+
 MVP scope: the walk + a simple end-of-walk recap. It does **not** persist decisions to a file, route deferrals, or apply fixes — acting on a choice is a separate, explicitly-confirmed step.
 
-## The hook (optional, off by default)
+## The hook
 
-`hook/contract_hook.py` is a `PreToolUse` hook for `AskUserQuestion` that enforces the contract on **every** question, not just inside the skill. It is **not registered** until you opt in.
+`hook/contract_hook.py` is a `PreToolUse` hook for `AskUserQuestion` that enforces the contract on **every** question, not just inside the skill. **As of 2026-06-06 it is registered** in the project `.claude/settings.json` in **soft mode**.
 
 - **Architecture:** a shared *parser* (finds contract gaps) feeding a `MODE`-gated *decision layer*.
 - **`MODE=soft`** (default): never blocks; when an option is missing an Implication/Trade-offs/Why, it returns `additionalContext` reminding the model — which sharpens the *next* question (it can't reform the one already shown).
@@ -56,6 +58,14 @@ Set the mode with the `BTD_HOOK_MODE` env var (default `soft`).
 ```
 
 **Disable:** remove that block (or set it aside) via the same skill.
+
+### Where it's registered — and the trade-off (note for future-you)
+
+It currently lives in **`.claude/settings.json`** — the **project-shared, committed** scope. The design spec wanted it there so the hook "travels with the repo." The implication: once this branch merges, the hook is active for **anyone** who uses this repo, and it fires on **every** `AskUserQuestion` in the project (soft mode, so only harmless nudges — it never blocks).
+
+If that ever feels too broad — e.g. you want the contract enforced **only for you**, or to stop imposing it on a public repo's other users — move the same `hooks` block to **`.claude/settings.local.json`** (personal, git-ignored). Same behavior, just not shared/committed. Decision as of 2026-06-06: **left in `settings.json`** (the spec's intent; this is a personal sandbox). No action needed unless that calculus changes.
+
+> Loading note: if you register or move it mid-session, run `/hooks` (or restart) so Claude Code's watcher picks up the change.
 
 > Caveat: it's unverified whether `PreToolUse` fires inside subagent tool calls — confirm before relying on the hook to cover subagents.
 
