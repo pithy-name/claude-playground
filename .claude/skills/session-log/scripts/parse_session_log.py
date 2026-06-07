@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""Deterministic parser for Session Log markdown files.
+"""Deterministic parser for Session Log markdown files (v2 format).
 
-This is the reference implementation of the hard acceptance criterion: a
-conforming Session Log must be extractable WITHOUT an LLM. The parser pulls the
-Goal, every required section's body, every timestamped Update block (in
-chronological order), and the To-do items, using only regex over the Markdown.
+Reference implementation of the hard acceptance criterion: a conforming Session Log
+must be extractable WITHOUT an LLM. Pulls the topic, Started, Session ID, Goal, every
+required H2 section, the three required H3 subsections under `## Learnings`, every
+timestamped Update block (chronological), and the To-do items — using only regex.
 
 Usage:
     python3 parse_session_log.py <path-to-session-log.md>
     python3 parse_session_log.py --self-test
 
 Exit codes:
-    0  the log conforms (all required fields extracted with zero manual fixup)
-    1  a required field failed to parse (the log is non-conforming)
+    0  conforming (all required fields extracted with zero manual fixup)
+    1  a required field failed to parse (non-conforming)
     2  file/argument error
 """
 
@@ -21,27 +21,28 @@ import json
 import re
 import sys
 
-# The fixed, exact enum of required section headings, in order. The parser — and
-# therefore the format — depends on these being present and spelled exactly.
-REQUIRED_SECTIONS = [
+# Fixed, exact enums. The parser — and the format — depend on these spellings.
+REQUIRED_H2 = [
     "What happened",
     "Decisions & trade-offs",
-    "Mistakes & corrections",
-    "What worked & what to repeat",
-    "Learnings about the user",
-    "Where to pick up",
+    "Learnings",
     "To-do",
 ]
+# H3 subsections required under `## Learnings`, in order.
+REQUIRED_H3 = [
+    "Mistakes & corrections",
+    "What worked & what to repeat",
+    "User preferences & conventions",
+]
 
-# Title line: "# Session: <topic> — <YYYY-MM-DD>"  (em dash separator)
-TITLE_RE = re.compile(r"^#\s+Session:\s+(?P<topic>.+?)\s+—\s+(?P<date>\d{4}-\d{2}-\d{2})\s*$")
-# Goal line: "**Goal:** <one line>"
+TITLE_RE = re.compile(r"^#\s+Session Log\s+—\s+(?P<topic>.+?)\s*$")
+STARTED_RE = re.compile(r"^\*\*Started:\*\*\s*(?P<started>.+?)\s*$")
+SESSION_ID_RE = re.compile(r"^\*\*Session ID:\*\*\s*(?P<sid>.+?)\s*$")
 GOAL_RE = re.compile(r"^\*\*Goal:\*\*\s*(?P<goal>.+?)\s*$")
-# Any level-2 heading.
-H2_RE = re.compile(r"^##\s+(?P<heading>.+?)\s*$")
-# The one canonical Update-block timestamp format: YYYY-MM-DDTHH:MM TZ (24h, tz label).
+H2_RE = re.compile(r"^##\s+(?P<h>.+?)\s*$")
+H3_RE = re.compile(r"^###\s+(?P<h>.+?)\s*$")
+# One canonical Update-block timestamp: YYYY-MM-DDTHH:MM TZ (24h, tz label).
 UPDATE_RE = re.compile(r"^Update\s+(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}\s+[A-Z]{2,5})$")
-# A naive sort key from the timestamp (tz label dropped — labels aren't offsets).
 TS_SORTKEY_RE = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})")
 
 
@@ -50,94 +51,108 @@ class ParseError(Exception):
 
 
 def parse(text):
-    """Parse Session Log text into a structured dict. Raise ParseError if a
-    required field is missing or malformed."""
     lines = text.splitlines()
 
-    # --- Title + date ---
+    # --- Title (H1) ---
     title = None
     title_idx = None
     for i, line in enumerate(lines):
         m = TITLE_RE.match(line)
         if m:
-            title = {"topic": m.group("topic"), "date": m.group("date")}
+            title = {"topic": m.group("topic")}
             title_idx = i
             break
     if title is None:
-        raise ParseError("missing or malformed title line "
-                         "(expected `# Session: <topic> — YYYY-MM-DD`)")
+        raise ParseError("missing or malformed title (expected `# Session Log — <Topic>`)")
 
-    # --- Goal (must appear before the first H2) ---
-    goal = None
+    # --- Metadata block (Started required; Session ID optional; Goal required) before first H2 ---
+    started = session_id = goal = None
     for line in lines[title_idx + 1:]:
         if H2_RE.match(line):
             break
-        m = GOAL_RE.match(line)
-        if m:
+        if (m := STARTED_RE.match(line)):
+            started = m.group("started")
+        if (m := SESSION_ID_RE.match(line)):
+            session_id = m.group("sid")
+        if (m := GOAL_RE.match(line)):
             goal = m.group("goal")
-            break
+    if started is None:
+        raise ParseError("missing `**Started:**` line under the title")
     if goal is None:
-        raise ParseError("missing Goal line (expected `**Goal:** ...` under the title)")
+        raise ParseError("missing `**Goal:**` line under the title")
 
-    # --- Walk H2 headings, collecting section bodies and Update blocks ---
-    sections = {}          # heading -> body text
-    updates = []           # list of {"timestamp", "body"} in document order
-    order = []             # document order of non-Update section headings
-    current = None         # ("section", heading) | ("update", ts) | None
+    # --- Walk H2 / H3, collecting section bodies, Learnings subsections, and Update blocks ---
+    sections = {}     # H2 heading -> body
+    learnings = {}    # H3 heading (under Learnings) -> body
+    updates = []      # {"timestamp", "body"} in document order
+    h2_order = []     # H2 section headings (excludes Update blocks)
+    h3_order = []     # H3 headings seen under the Learnings H2
+    cur = None        # ("h2", name) | ("update", ts) | ("h3", name)
+    cur_h2 = None     # name of the enclosing H2
     buf = []
 
     def flush():
-        if current is None:
+        if cur is None:
             return
         body = "\n".join(buf).strip()
-        kind, key = current
-        if kind == "section":
+        kind, key = cur
+        if kind == "h2":
             sections[key] = body
-            order.append(key)
-        else:
+        elif kind == "update":
             updates.append({"timestamp": key, "body": body})
+        elif kind == "h3":
+            learnings[key] = body
 
     for line in lines[title_idx + 1:]:
-        m = H2_RE.match(line)
-        if m:
-            flush()
-            buf = []
-            heading = m.group("heading")
+        m2 = H2_RE.match(line)
+        m3 = H3_RE.match(line)
+        if m2:
+            flush(); buf = []
+            heading = m2.group("h")
             um = UPDATE_RE.match(heading)
             if um:
-                current = ("update", um.group("ts"))
+                cur = ("update", um.group("ts")); cur_h2 = None
             elif re.match(r"^Update\b", heading):
-                # Looks like an Update block but the timestamp is malformed — the
-                # exact failure (guessed/wrong-format time) the skill prevents.
                 raise ParseError(
                     f"malformed Update heading: `## {heading}` "
-                    "(expected `## Update YYYY-MM-DDTHH:MM TZ`, 24h + tz label)")
+                    "(expected `## Update YYYY-MM-DDTHH:MM TZ`)")
             else:
-                current = ("section", heading)
+                cur = ("h2", heading); cur_h2 = heading
+                h2_order.append(heading)
+        elif m3:
+            flush(); buf = []
+            heading = m3.group("h")
+            cur = ("h3", heading)
+            if cur_h2 == "Learnings":
+                h3_order.append(heading)
         else:
-            if current is not None:
+            if cur is not None:
                 buf.append(line)
     flush()
 
-    # --- Validate required sections present ---
-    missing = [s for s in REQUIRED_SECTIONS if s not in sections]
-    if missing:
-        raise ParseError("missing required section(s): " + ", ".join(missing))
+    # --- Validate required H2 present + in order (Update blocks ignored) ---
+    missing2 = [s for s in REQUIRED_H2 if s not in sections]
+    if missing2:
+        raise ParseError("missing required section(s): " + ", ".join(missing2))
+    present2 = [h for h in h2_order if h in REQUIRED_H2]
+    if present2 != REQUIRED_H2:
+        raise ParseError(f"required sections out of order.\n  expected: {REQUIRED_H2}\n  found:    {present2}")
 
-    # --- Required-section order check (ignoring Update blocks) ---
-    present_required = [h for h in order if h in REQUIRED_SECTIONS]
-    if present_required != REQUIRED_SECTIONS:
-        raise ParseError("required sections out of order.\n"
-                         f"  expected: {REQUIRED_SECTIONS}\n"
-                         f"  found:    {present_required}")
+    # --- Validate required H3 under Learnings present + in order ---
+    missing3 = [s for s in REQUIRED_H3 if s not in learnings]
+    if missing3:
+        raise ParseError("missing required Learnings subsection(s): " + ", ".join(missing3))
+    present3 = [h for h in h3_order if h in REQUIRED_H3]
+    if present3 != REQUIRED_H3:
+        raise ParseError(f"Learnings subsections out of order.\n  expected: {REQUIRED_H3}\n  found:    {present3}")
 
-    # --- Update blocks must be chronological (ascending naive timestamp) ---
+    # --- Update blocks must be chronological ---
     def sortkey(ts):
         mm = TS_SORTKEY_RE.match(ts)
         return mm.group(1) if mm else ts
     ts_list = [u["timestamp"] for u in updates]
     if ts_list != sorted(ts_list, key=sortkey):
-        raise ParseError("Update blocks are not in chronological order: " + ", ".join(ts_list))
+        raise ParseError("Update blocks not in chronological order: " + ", ".join(ts_list))
 
     # --- To-do items ---
     todo_open, todo_done = [], []
@@ -150,8 +165,11 @@ def parse(text):
 
     return {
         "title": title,
+        "started": started,
+        "session_id": session_id,
         "goal": goal,
-        "sections": {s: sections[s] for s in REQUIRED_SECTIONS},
+        "sections": {s: sections[s] for s in REQUIRED_H2},
+        "learnings": {s: learnings[s] for s in REQUIRED_H3},
         "updates": updates,
         "todo": {"open": todo_open, "done": todo_done},
     }
@@ -166,66 +184,75 @@ def parse_file(path):
         sys.exit(2)
 
 
-# The reference example, kept in sync with references/format-spec.md. Used by
-# --self-test so the parser ships with its own acceptance test.
-REFERENCE_EXAMPLE = """# Session: script-folders — 2026-05-18
+# Reference example (kept in sync with references/format-spec.md). Drives --self-test.
+REFERENCE_EXAMPLE = """# Session Log — script-folders
 
+**Started:** 2026-05-18 14:02 PT
+**Session ID:** sess-2f9c1a4b
 **Goal:** Reorganize tool scripts into self-contained per-tool folders.
 
 ## What happened
 - Reorganized tool scripts into per-tool folders; added READMEs.
 
 ## Decisions & trade-offs
-**Folder granularity:** one folder per tool vs one shared utils/. Chose per-tool — keeps each tool self-contained and independently runnable.
+**Folder granularity**
+- Options considered: one folder per tool vs one shared utils/.
+- Chosen: per-tool.
+- Why: keeps each tool self-contained and independently runnable.
+- Implication: shared helpers are promoted deliberately, not duplicated by accident.
 
-## Mistakes & corrections
+## Learnings
+
+### Mistakes & corrections
 **Symptom:** Moved a script before updating its relative import.
-**Root cause:** Edited path in one place, not the caller.
+**Root cause:** Edited the path in one place, not the caller.
 **Correct approach:** grep for references before moving a file.
 
-## What worked & what to repeat
-**Grep-before-move, once adopted:** after the first slip, grepping for references ahead of each move caught two more stale imports. Why it worked: surfaced callers the editor didn't show. Repeat for every file move.
+### What worked & what to repeat
+**Grep-before-move, once adopted**
+Why it worked: surfaced callers the editor didn't show, catching two more stale imports.
+Repeat: for every file move.
 
-## Learnings about the user
-Wants verification before "done" — asked "did you actually run it?" after a claim. Run it, then report.
-
-## Where to pick up
-Next: add tests for `find_files.py`. Reference: `tools/find-files/README.md`.
+### User preferences & conventions
+- Wants verification before "done" — asked "did you actually run it?" after a claim. Run it, then report.
 
 ## Update 2026-05-18T14:02 PT
-- Set up the find-files tool; completed "split utils" (struck in To-do below).
+- Set up the find-files tool; completed "split utils" (struck in To-do).
+
+## Update 2026-05-18T14:42 PT
+- Added a second tool folder; refreshed its README.
 
 ## To-do
-- ~~Split shared utils into per-tool folders~~ done
+- [x] ~~Split shared utils into per-tool folders~~ done
 - [ ] Add tests for find_files.py
 """
 
 
 def self_test():
-    result = parse(REFERENCE_EXAMPLE)
-    assert result["title"]["topic"] == "script-folders", result["title"]
-    assert result["title"]["date"] == "2026-05-18", result["title"]
-    assert result["goal"].startswith("Reorganize tool scripts"), result["goal"]
-    for s in REQUIRED_SECTIONS:
-        assert result["sections"][s].strip(), f"empty required section: {s}"
-    assert len(result["updates"]) == 1, result["updates"]
-    assert result["updates"][0]["timestamp"] == "2026-05-18T14:02 PT"
-    assert result["todo"]["open"] == ["Add tests for find_files.py"], result["todo"]
-    assert len(result["todo"]["done"]) == 1, result["todo"]
+    r = parse(REFERENCE_EXAMPLE)
+    assert r["title"]["topic"] == "script-folders", r["title"]
+    assert r["started"] == "2026-05-18 14:02 PT", r["started"]
+    assert r["session_id"] == "sess-2f9c1a4b", r["session_id"]
+    assert r["goal"].startswith("Reorganize"), r["goal"]
+    for s in REQUIRED_H2:
+        assert r["sections"][s] is not None, s
+    for s in REQUIRED_H3:
+        assert r["learnings"][s].strip(), f"empty Learnings subsection: {s}"
+    assert [u["timestamp"] for u in r["updates"]] == ["2026-05-18T14:02 PT", "2026-05-18T14:42 PT"], r["updates"]
+    assert r["todo"]["open"] == ["Add tests for find_files.py"], r["todo"]
+    assert len(r["todo"]["done"]) == 1, r["todo"]
     print("self-test PASSED — every required field extracted with zero manual fixup")
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Parse / validate a Session Log markdown file.")
+    ap = argparse.ArgumentParser(description="Parse / validate a Session Log markdown file (v2).")
     ap.add_argument("path", nargs="?", help="path to a Session Log .md file")
-    ap.add_argument("--self-test", action="store_true",
-                    help="parse the bundled reference example and assert all fields extract")
+    ap.add_argument("--self-test", action="store_true", help="parse the bundled reference example")
     args = ap.parse_args()
 
     if args.self_test:
         self_test()
         return
-
     if not args.path:
         ap.error("provide a path to a Session Log, or --self-test")
 
@@ -236,9 +263,9 @@ def main():
         sys.exit(1)
 
     print(json.dumps(result, indent=2, ensure_ascii=False))
-    print(f"\nCONFORMING: extracted goal + {len(result['sections'])} required sections "
-          f"+ {len(result['updates'])} update block(s) + "
-          f"{len(result['todo']['open'])} open / {len(result['todo']['done'])} done to-dos",
+    print(f"\nCONFORMING: topic + Started + Goal + {len(result['sections'])} H2 sections "
+          f"+ {len(result['learnings'])} Learnings subsections + {len(result['updates'])} update(s) "
+          f"+ {len(result['todo']['open'])} open / {len(result['todo']['done'])} done to-dos",
           file=sys.stderr)
 
 

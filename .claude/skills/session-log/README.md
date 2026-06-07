@@ -6,7 +6,7 @@ Creates and maintains a **Session Log** — a per-session posterity record and e
 
 ## What it produces
 
-One Session Log markdown file per session in `.claude/session-logs/`, named `YYYY-MM-DD-topic.md` (dated by session start). The format keeps required sections, append-only timestamped Update blocks, and a To-do list — all parseable without an LLM.
+One Session Log markdown file per session, stored **centrally** at `~/.claude/session-logs/<repo>/YYYY-MM-DDTHHMM-topic.md` — outside any repo, so no per-project `.gitignore` and no public-repo leak risk (date+time prefix, `T`-separated, no colon/TZ; by session start). The body uses a `# Session Log — <topic>` header with `Started` / `Session ID` / `Goal` metadata, a `## Learnings` group (Mistakes & corrections / What worked & what to repeat / User preferences & conventions), append-only timestamped Update blocks, and a To-do list — all parseable without an LLM.
 
 ## Structure
 
@@ -40,11 +40,11 @@ Exit 0 + full JSON extraction = the log conforms to the machine-readable accepta
 
 ## Provenance
 
-Derived from the Session Log format spec + PRD (two red-team passes each). Distinct from Claude's *native scratchpad* concept. Supersedes the `session-journal` experiment in this repo.
+Distinct from Claude's *native scratchpad* concept (an internal Claude thing). The format is tuned for retros and post-mortems — it captures both what went wrong (to stop) and what went right (to repeat).
 
 ## Authority
 
-Once live, this skill is the single source of truth for Session Log conventions, replacing the (to-be-removed) CLAUDE.md "Session Management" section. One authority = no competing copy = no drift.
+This skill is the single source of truth for Session Log conventions. If you also keep session/scratchpad rules in a `CLAUDE.md`, let this skill supersede them — one authority means no competing copy and no drift.
 
 ## Usage
 

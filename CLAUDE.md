@@ -20,7 +20,7 @@ A personal sandbox for exploring Claude Code features — primarily skills and a
 
 ## Session logs
 
-Session logs live at `.claude/session-logs/` (the project's term for what the global default calls "scratchpads"). Gitignored.
+Session logs are produced by the `session-log` skill and stored **centrally** at `~/.claude/session-logs/<repo>/` — outside any repo, so they're never a public-repo privacy risk and need no per-project `.gitignore`. ("Session log" is this project's term for what the global default calls "scratchpads.") The repo's `.gitignore` still lists `.claude/session-logs/` as belt-and-suspenders against stray local writes.
 
 ## Workflow
 

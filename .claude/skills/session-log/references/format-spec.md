@@ -1,14 +1,15 @@
 # Session Log — Format Spec (full depth)
 
-Full per-section guidance, the reference example, and the close checklist. SKILL.md has the operational summary; read this when you need the depth or a worked example.
+Full per-section guidance, the reference example, and the close checklist. SKILL.md has the operational summary; read this for depth or a worked example.
 
 > **Path policy in examples:** placeholders only (`~` = home; `<project-slug>` = the project's dir under `~/.claude/projects/`). No absolute paths, no usernames — this ships in a public repo.
 
 ## Table of contents
 
-- [Philosophy — what a Session Log is for](#philosophy)
-- [Required sections, in order](#required-sections)
+- [Philosophy](#philosophy)
+- [Required structure, in order](#required-structure)
 - [Section guidance](#section-guidance)
+- [Chronological-append discipline](#chronological-append-discipline)
 - [Memory writes](#memory-writes)
 - [decisions.md promotion](#decisionsmd-promotion)
 - [Session-close checklist](#session-close-checklist)
@@ -16,129 +17,102 @@ Full per-section guidance, the reference example, and the close checklist. SKILL
 
 ## Philosophy
 
-- **Posterity record with an executive top.** Substitutes for reading the whole transcript: what was accomplished and learned by session end. The top (Goal + What happened) is the quick executive read; the sections below are supporting depth. Length scales with the session — it is **not** capped to one page. Also used for post-mortems.
-- **Top half = summary of the whole session:** the What-happened list, decisions + trade-offs, mistakes + corrections (a mistake *is* a learning), what worked + what to repeat (the positive counterpart — a retro learns from both), learnings about the user.
-- **Mistakes / corrections / wins / learnings should be reusable to improve future processes.** The exact extraction mechanism is TBD, but write them as if a future session will mine them.
-- **The decision log shows the FINAL decision**, not a version later changed. The chronological Update blocks capture each decision at the time it was made (and when it changed) — the top reflects the end state, the timeline reflects the evolution.
+- **Posterity record with an executive top.** Substitutes for reading the whole transcript. The top (Started/Goal + What happened) is the quick read; the sections below are supporting depth. Length scales with the session — not capped. Also used for post-mortems.
+- **Captures both directions.** A retro learns from what went *right* (repeat it) as much as what went *wrong* (stop it). That's why Learnings groups Mistakes, What-worked, and User-preferences together.
+- **Final state up top, evolution in the timeline.** Thematic sections reflect the end state; the chronological Update blocks capture how it got there.
 
-## Required sections
+## Required structure
 
 ```markdown
-# Session: [Topic] — YYYY-MM-DD
+# Session Log — [Topic]
 
+**Started:** YYYY-MM-DD HH:MM TZ
+**Session ID:** <id>
 **Goal:** one line — what this session set out to do.
 
 ## What happened
 
 ## Decisions & trade-offs
 
-## Mistakes & corrections
+## Learnings
 
-## What worked & what to repeat
+### Mistakes & corrections
 
-## Learnings about the user
+### What worked & what to repeat
 
-## Where to pick up
+### User preferences & conventions
 
 [...timestamped Update blocks go here, in chronological order...]
 
 ## To-do
 ```
 
-These headings are a **fixed, exact enum**. The deterministic parser (`scripts/parse_session_log.py`) depends on each being present and spelled exactly — don't rename, reorder, or substitute free-form text where a required heading is expected.
+These headings are a **fixed, exact enum**. The parser (`scripts/parse_session_log.py`) depends on each being present and spelled exactly — don't rename, reorder, or substitute free-form text. Keep the blank line after `## Learnings`.
 
 ## Section guidance
 
-### Goal (header line, under the title)
-One-line statement of session intent — what we set out to do. *Why:* anchors the executive top so a future reader grasps the *why* before the details.
-
-- One line. Plain prose, not a bullet list.
+### Header (title + metadata)
+- `# Session Log — [Topic]` — the topic only; **no date in the H1** (the date lives in `**Started:**` and the filename).
+- `**Started:**` — session start date + time + timezone, e.g. `2026-06-06 15:42 PT`.
+- `**Session ID:**` — the session's stable identity (the `SessionStart` hook fills this from stdin). Lets a log be traced back to its transcript.
+- `**Goal:**` — one line of session intent. *Why:* anchors the executive top so a reader grasps the *why* first.
 
 ### What happened
-Big-picture executive overview of work completed this session. *Why:* lets a future reader grasp the session arc in ~30 seconds without reading the transcript. Updated in-place throughout — not batched at the end.
-
-- Bulleted list of work completed — big-picture, executive takeaways.
-- Add in-place as work is done; do not batch for end of session.
-- Not every to-do needs to appear here (to-do completion is captured in Update blocks).
+Bulleted executive overview of work completed. *Why:* lets a reader grasp the arc in ~30s. Add in-place as you go; don't batch at close. At close, refresh into named arcs (primary + secondary threads) ending with a **Final state** line (done / deferred / open).
 
 ### Decisions & trade-offs
-Final decisions with alternatives + rationale + implication. *Why:* "we chose X" loses the context of what was considered; named alternatives make the reasoning auditable and reversible if context later changes. The top reflects the FINAL choice; the Update timeline captures any revisions.
+One entry per decision, each a **bold heading** then bullets. *Why:* "we chose X" loses the context of what was considered; named alternatives make the reasoning auditable and reversible.
 
-- Each decision gets a **bold heading**.
-- List alternatives explicitly *before* stating the choice.
-- Include rationale tied to the user's goal.
-- State the **implication** of the choice, not just the bare fact.
-- Example:
-  ```
-  **"Empty folder" definition:** Two options: (1) no direct files only, or (2) no files anywhere in subtree. Chose recursive — stricter and more useful for cleanup purposes.
-  ```
-- If a decision is **revised mid-session**: strikethrough the old entry, add a new entry with an inline timestamp `*(YYYY-MM-DDTHH:MM TZ)*`. No timestamp on entries never revised. (Top reflects the final choice; the timeline logs both original and change.)
+```
+**<Decision name>**
+- Options considered: <alternative A> vs <alternative B>
+- Chosen: <the choice>
+- Why: <rationale tied to the goal>
+- Implication: <downstream consequence>   (optional — include when not obvious)
+```
 
-### Mistakes & corrections
-Process failures named with Symptom / Root cause / Correct approach. A mistake is a learning — the aim is to improve future processes. *Why:* surface-level mistake logs ("I did X wrong") don't help future sessions avoid the error; root cause + correct approach does.
+### Learnings
+An H2 umbrella over the three kinds of learning. *Why:* when the user says "capture learnings," they mean **all three** — Mistakes, What-worked, and User-preferences — not just the user one. Grouping them removes that ambiguity. The `## Learnings` line itself carries no body; its content is the three H3 subsections.
 
-- Use the explicit triplet, with **bold** labels: `**Symptom:**` / `**Root cause:**` / `**Correct approach:**`.
-- Symptom anchors in observable reality (a verbatim user quote or error message when available); Root cause names the underlying mechanism, not the surface failure; Correct approach is forward-looking guidance.
-- Capture meta-failures — failures about the process itself, not just the task.
-- Example:
-  ```
-  **Symptom:** Rewrote entire README when asked to "add" a section.
-  **Root cause:** Defaulted to Write tool without checking existing content.
-  **Correct approach:** Use Edit, additive only; read before writing.
-  ```
+#### ### Mistakes & corrections
+Process failures as a triplet. *Why:* "I did X wrong" doesn't help future sessions; root cause + correct approach does.
 
-### What worked & what to repeat
-Wins, effective approaches, and good calls worth repeating — the positive counterpart to Mistakes. *Why:* a retro needs both sides. A log that only records failures teaches what to *stop*, never what to *keep doing*; capturing what worked (and the mechanism behind it) turns successful patterns into reusable practice instead of luck.
+```
+**Symptom:** what happened (verbatim user quote / error message when available)
+**Root cause:** the underlying mechanism, not the surface failure
+**Correct approach:** forward-looking guidance
+```
+Capture meta-failures (failures about the process itself). Bold labels are mandatory — the visual weight makes the section scannable.
 
-- Name the win + **why it worked** (the underlying mechanism, not just "it went well") + whether it's worth repeating or promoting to a durable practice.
-- Anchor in observable reality where possible — what specifically succeeded and the signal it worked.
-- Capture process wins, not just task wins — an effective workflow or sequence is itself reusable.
-- Where a path was chosen over an alternative, **quantify the payoff when estimable** — time/effort saved, rework avoided — sized case-by-case to the context and the path actually taken, not a fixed figure.
-- Examples:
-  ```
-  **Worktree before editing a cross-branch spec:** spun an isolated git worktree instead of switching branches in a shared working tree. Why it worked: zero collision with the parallel session sharing the tree. Repeat for any cross-branch edit while another session is live.
-  ```
-  ```
-  **Build-vs-buy → reuse:** scouted for prior work before building and found the skill already designed — PRD, format spec, and a dedicated branch. Reused that instead of rebuilding from scratch. Why it worked: a short investigation pass surfaced finished prior work. Payoff: ~15h of redesign avoided. Repeat: always scout for existing work/tools before building.
-  ```
+#### ### What worked & what to repeat
+The positive counterpart to Mistakes. *Why:* a log that only records failures teaches what to stop, never what to keep doing.
 
-### Learnings about the user
-Preferences, patterns, and style observed during the session, each tagged with the observable signal that revealed it. *Why:* generic observations ("user values existing work") are too vague to act on; specific signals + behavioral implications are what future sessions can actually use.
+```
+**<the win>**
+Why it worked: <the mechanism, on its own line>
+Repeat: <whether/when to do it again>
+```
+Quantify the payoff when estimable (time saved, rework avoided). Capture process wins, not just task wins.
 
-- Each learning includes the **observable signal** that revealed the preference.
-- Write as actionable guidance — specific and behavioral, not generic.
-- Tag session-scoped learnings (not yet memory-worthy) inline with `*(session-log-only, not promoted to memory)*`.
-- Example:
-  ```
-  Values existing work — "perfectly good and fine" signals satisfaction before a redirect; don't overwrite approved content.
-  ```
+#### ### User preferences & conventions
+Preferences, patterns, and working style observed this session. *Why:* generic notes ("values existing work") are too vague; specific signals + behavioral implications are usable by a future session.
 
-### Where to pick up
-A footer pointing future-self at canonical sources first. *Why:* zero re-acquaint friction on return — the next session shouldn't have to re-read the whole log to know where to start.
-
-- Short and concrete; link to paths.
-- Canonical sources first (backlog → pick item → reference logs only if needed → noting any archived plans).
+- Each entry includes the **observable signal** that revealed it; written as actionable guidance.
+- Tag session-scoped ones `*(session-log-only, not promoted to memory)*`.
+- Example: `Wants verification before "done" — asked "did you actually run it?" Run it, then report.`
 
 ### Update blocks (timestamped activity log)
-Chronological append-only snapshots of work between updates — an honest accounting of how the session progressed, evolved, or side-quested. *Why:* enables retrospective pacing analysis ("how long did step X take?") and captures the time-evolution of decisions and todos. Sits **immediately above To-do**.
-
-Format: `## Update YYYY-MM-DDTHH:MM TZ`
-
-- 24-hour clock, local timezone; timestamps **accurate, not guessed**.
-- Append in chronological order; never insert above an existing block.
-- Use for: files written, memory saved, CLAUDE.md modified, todos crossed off, significant findings, decisions made/changed (with the time), research/investigation conducted, and the exploration or prep work that led to a milestone (the path to it, not only the milestone itself).
-- Do NOT duplicate thematic content here — a decision goes in Decisions, not in an Update block.
+Chronological append-only snapshots of work between updates. Sits immediately above To-do. Format: `## Update YYYY-MM-DDTHH:MM TZ` (24h, local TZ, with the `T`, colon, and TZ label). Accurate, never guessed. Use for files written, memory saved, findings, decisions made/changed (with time), research/prep that led to a milestone. Don't restate thematic content.
 
 ### To-do
-Open items + recently-completed items (struck through, not deleted). *Why:* this is the next-action prompt — what's still owed at close. Lives at the very bottom because it's what the next session picks up.
+Open + recently-completed items. *Why:* the next-action prompt. Always the last section.
+- `- [ ]` open; `- [x] ~~struck text~~ done` for completed — keep the checkbox **and** strike the text, never delete.
 
-- `[ ]` checkboxes for uncompleted items.
-- When completed later in session: strikethrough the whole line with `~~...~~`, do not delete.
-- Always stays at the **bottom** of the file.
+## Chronological-append discipline
+
+Append new entries at the **END** of every section (oldest→newest) — not only Update blocks. Never anchor an Edit *above* an older entry because that string is convenient; it silently reorders the section and misrepresents how the thinking evolved. (The one exception is the close-time refresh of "What happened," which deliberately reorganizes into arcs.)
 
 ## Memory writes
-
-When a persistent memory file is written during a session, log it with its path:
 
 ```
 - Written to persistent memory:
@@ -147,63 +121,65 @@ When a persistent memory file is written during a session, log it with its path:
 
 ## decisions.md promotion
 
-Only where the project has a `decisions.md` (many won't — if absent, skip):
-
-- Review the Decisions & trade-offs section.
-- Promote any decision with lasting cross-session impact to `decisions.md`.
-- Note "promoted to decisions.md" on the Session Log entry.
-- Don't duplicate — Session Log = session staging, decisions.md = persistent record.
+Only where the project has a `decisions.md` (many won't — skip if absent): review Decisions, promote any with lasting cross-session impact, note "promoted to decisions.md" on the entry. Don't duplicate.
 
 ## Session-close checklist
 
-When the user signals close, audit before confirming done:
-
-- [ ] Every decision has alternatives listed and rationale tied to the user's goal
-- [ ] Every mistake has root cause + forward-looking "Correct approach:" statement
-- [ ] Meta-failures captured (failures about the process itself)
-- [ ] Every "What worked" entry names why it worked + whether to repeat (payoff quantified where estimable)
-- [ ] Every learning has an observable signal and is actionable
+- [ ] "What happened" refreshed into arcs + a "Final state" line
+- [ ] Every decision has Options considered / Chosen / Why
+- [ ] Every mistake has root cause + "Correct approach:"; meta-failures captured
+- [ ] Every win has "Why it worked:" on its own line
+- [ ] Every user-preference has an observable signal and is actionable
+- [ ] **Learnings populated** — none of the three subsections left empty if the session produced any
 - [ ] All memory writes logged with paths
-- [ ] Todos current — completed ones crossed out with `~~strikethrough~~`
-- [ ] Final timestamped `## Update` block written for this session's last batch of actions
+- [ ] Todos current — done items as `- [x] ~~…~~`
+- [ ] Final timestamped `## Update` block; no duplicate timestamps; updates chronological
 - [ ] decisions.md promotion reviewed (only if the project has one)
-- [ ] No duplicate timestamp blocks
-- [ ] "Where to pick up" footer written
-- [ ] **Stale-claim audit** — re-verify carry-forward claims that may have become false during the session (e.g. "X file still on disk", "Y dir still empty"). Quick `ls`/`cat` to confirm reality before close.
+- [ ] **Stale-claim audit** — re-verify carry-forward claims with a quick `ls`/`cat`
 
 ## Reference example
 
-A minimal Session Log showing the shape (path-agnostic, no PII). This is also the fixture the parser test runs against — keep it conforming.
+A minimal conforming Session Log (path-agnostic, no PII). This is the fixture the parser test runs against — keep it conforming.
 
 ```markdown
-# Session: script-folders — 2026-05-18
+# Session Log — script-folders
 
+**Started:** 2026-05-18 14:02 PT
+**Session ID:** sess-2f9c1a4b
 **Goal:** Reorganize tool scripts into self-contained per-tool folders.
 
 ## What happened
 - Reorganized tool scripts into per-tool folders; added READMEs.
 
 ## Decisions & trade-offs
-**Folder granularity:** one folder per tool vs one shared utils/. Chose per-tool — keeps each tool self-contained and independently runnable.
+**Folder granularity**
+- Options considered: one folder per tool vs one shared utils/.
+- Chosen: per-tool.
+- Why: keeps each tool self-contained and independently runnable.
+- Implication: shared helpers are promoted deliberately, not duplicated by accident.
 
-## Mistakes & corrections
+## Learnings
+
+### Mistakes & corrections
 **Symptom:** Moved a script before updating its relative import.
-**Root cause:** Edited path in one place, not the caller.
+**Root cause:** Edited the path in one place, not the caller.
 **Correct approach:** grep for references before moving a file.
 
-## What worked & what to repeat
-**Grep-before-move, once adopted:** after the first slip, grepping for references ahead of each move caught two more stale imports. Why it worked: surfaced callers the editor didn't show. Repeat for every file move.
+### What worked & what to repeat
+**Grep-before-move, once adopted**
+Why it worked: surfaced callers the editor didn't show, catching two more stale imports.
+Repeat: for every file move.
 
-## Learnings about the user
-Wants verification before "done" — asked "did you actually run it?" after a claim. Run it, then report.
-
-## Where to pick up
-Next: add tests for `find_files.py`. Reference: `tools/find-files/README.md`.
+### User preferences & conventions
+- Wants verification before "done" — asked "did you actually run it?" Run it, then report.
 
 ## Update 2026-05-18T14:02 PT
-- Set up the find-files tool; completed "split utils" (struck in To-do below).
+- Set up the find-files tool; completed "split utils" (struck in To-do).
+
+## Update 2026-05-18T14:42 PT
+- Added a second tool folder; refreshed its README.
 
 ## To-do
-- ~~Split shared utils into per-tool folders~~ done
+- [x] ~~Split shared utils into per-tool folders~~ done
 - [ ] Add tests for find_files.py
 ```

@@ -30,7 +30,7 @@ Skim the list once so you recognize the situations; consult the detail when one 
 
 13. **Update-block chronological order is append-only.** **[always-on]** New Update blocks always go at the END of the Update-block run (which sits immediately above To-do), in chronological order. Never insert above existing blocks — that creates a reverse-chronological mess future readers must re-sort. If a missed block needs backfilling, write a single retroactive Update with explicit "exact times not captured at the moment" framing and cross-ref a source with canonical timestamps if one exists. Don't fabricate prior timestamps to hide the gap.
 
-14. **"Where to pick up" footer.** Write a "Where to pick up" footer pointing future-self at canonical sources first (backlog file → pick item → reference logs only if needed → noting any archived plans). Placed **above** the Update blocks (Updates sit immediately above the trailing To-do, so the footer goes one level up). Goal: zero re-acquaint friction on return. Keep it short, concrete, link-to-paths.
+14. **Optional "where to pick up" note (ad-hoc — NOT a required section).** For handoff or multi-day sessions, you may add a short "Where to pick up" note pointing future-self at canonical sources first (backlog file → pick item → reference logs → archived plans). It is *not* part of the required structure — add it only when a return is likely; skip it for quick sessions. Keep it short, concrete, link-to-paths.
 
 **Unifying principle:** the Session Log is a deliberate artifact whose structure can be improved *within* a session, not a fixed template to fill in. Encourage pattern-finding over data entry — leave room for in-session structural innovation, validated by the user, that improves on the template.
 
