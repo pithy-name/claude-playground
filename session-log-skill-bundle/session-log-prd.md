@@ -1,5 +1,7 @@
 # PRD: Session Log Skill
 
+> **⚠️ Superseded / frozen (2026-06-06).** The skill is built and live at `.claude/skills/session-log/`, which is now the canonical authority for format + behavior (**v2**). This PRD is the historical strategy/decision record; some format details are v1. Where it disagrees with the skill, the skill wins.
+
 **Date:** 2026-05-28
 **Status:** Final draft — not done (spec still being refined; PRD content stable pending spec sync)
 **Canonical spec:** `plans/session-log-skill-spec.md` — the standalone, self-contained build reference (format spec + validated patterns). `archive/scratchpad-management-skill.DEPRECATED.md` is the frozen historical source it was derived from. This PRD owns *strategy, naming, architecture, and scope* — not format detail. Do not duplicate the spec here.

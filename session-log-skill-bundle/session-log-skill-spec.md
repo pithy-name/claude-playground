@@ -1,5 +1,7 @@
 # Session Log Skill — Format Spec & Validated Patterns
 
+> **⚠️ Superseded / frozen (2026-06-06).** The canonical, current (**v2**) format lives in the built skill at `.claude/skills/session-log/` (`SKILL.md` + `references/format-spec.md`). This bundle is the **historical design record** (original build input + decision history) — its format details below are **v1 and out of date** (the v2 redesign changed the header, grouped Mistakes/What-worked/user-learnings under `## Learnings`, changed the Decisions format, and removed "Where to pick up"). Where this disagrees with the skill, **the skill wins.** Frozen post-build per PRD §7.5 to prevent a competing live copy.
+
 > **Naming note:** the **Session Log** here is distinct from Claude's *native scratchpad* concept (a different, internal Claude thing). Where this doc refers to Claude's native scratchpad, it says so explicitly.
 >
 > **Terminology:** the **Session Log** is the artifact; **`session-log`** is the skill; **`.claude/session-logs/`** is the directory. Three different things, deliberately named alike.
@@ -50,16 +52,19 @@ When invoked, guide Claude to correctly create or update a Session Log: (1) crea
 
 ### Filename
 
-`.claude/session-logs/YYYY-MM-DD-topic.md`
+`.claude/session-logs/YYYY-MM-DD-HHMM-topic.md`
 
-- Date = **session start date**, not the date the log is written (sessions can span midnight)
-- Topic = short kebab-case descriptor of the session's main work
+- Prefix = **session start date + time** (24h local) — the time prefix prevents parallel same-day sessions colliding
+- Topic = short kebab-case descriptor of the session's main work (the hook creates a `-session` placeholder; rename once clear)
+- A `**Session ID:**` line sits directly under the H1 — stable identity in the body, not the filename; the hook keys idempotency on it (a resume reuses the same file)
 - Never overwrite an existing Session Log
 
 ### Required sections (in this order)
 
 ```markdown
 # Session: [Topic] — YYYY-MM-DD
+
+**Session ID:** <id>
 
 **Goal:** one line — what this session set out to do.
 
@@ -244,6 +249,8 @@ A minimal Session Log showing the shape (path-agnostic, no PII):
 ```markdown
 # Session: script-folders — 2026-05-18
 
+**Session ID:** sess-2f9c1a4b
+
 **Goal:** Reorganize tool scripts into self-contained per-tool folders.
 
 ## What happened
@@ -316,7 +323,7 @@ Parked ideas — do NOT build in v1, but don't foreclose them either. Recorded s
 
 ## Rules this skill enforces (always-on summary)
 
-- Filename dated by session start; never overwrite
+- Filename prefixed by session start date+time (`YYYY-MM-DD-HHMM-topic.md`); `**Session ID:**` line directly under the H1; never overwrite
 - Required sections in order (Goal header → What happened → Decisions → Mistakes → What worked & what to repeat → Learnings → Where to pick up → Update blocks → To-do), with depth guidance (Decisions: named headings + alternatives + implication; Mistakes: bold Symptom/Root cause/Correct approach triplet + meta-failures; What worked: win + why it worked + repeat?, quantify payoff when estimable; Learnings: observable signal + actionable + specific)
 - Thematic sections are living reference sections — edit in-place; refresh "What happened" at close for the full arc
 - Timestamped Update blocks are an append-only, chronological activity log — capture the work *between* artifacts (research, investigation, prep that led to a milestone), not only the outputs; not for thematic content; accurate timestamps, never guessed; sit immediately above To-do
