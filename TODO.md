@@ -8,6 +8,7 @@ Backlog for the `claude-playground` sandbox. Active in-flight work lives in sess
 - [ ] Migrate `gitignore-checker` → PostToolUse hook on `.gitignore` Write/Edit
 - [ ] Build a "Session Log" skill (formalize the workflow currently in `.claude/session-logs/`)
 - [ ] Evals for `meetgeek-to-md` skill
+- [ ] Build a cross-project memory-curation skill. Gap: auto-memory (`~/.claude/projects/<repo>/memory/`) is per-repo with no built-in promotion, and global `~/.claude/CLAUDE.md` is the only cross-project surface — so broadly-useful memories get stuck in one repo. Skill would scan `~/.claude/projects/*/memory/*.md`, flag global-promotion candidates (generic feedback, no project-specific nouns), and help move them (keep global <200 lines). Also leverage `.claude/rules/` symlinks to share rule-sets across repos without duplication. No existing tool does this (`claude-automation-recommender` / `claude-md-improver` only touch CLAUDE.md files).
 
 ## Claude Code integration
 
