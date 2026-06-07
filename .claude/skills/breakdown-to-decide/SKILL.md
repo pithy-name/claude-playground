@@ -45,10 +45,12 @@ You don't need to spend option slots on "skip" or "let's discuss" — `AskUserQu
 
 2. **List the full set, then confirm.** Before walking, state the complete set you're about to cover (count + one-line titles) so the user sees the whole map and can catch anything missing. If it's ambiguous which set they mean (the chat holds several analyses), confirm which before starting.
 
-3. **Walk one at a time, in order.** For each decision:
-   - Print the prose writeup (Issue + Why it matters), then the options laid out.
-   - Fire `AskUserQuestion` with the contract-shaped options.
-   - **Wait for the answer before moving on.** One decision per step is the whole point — it's what keeps the user oriented.
+3. **Group independent decisions into one question card.** `AskUserQuestion` takes **up to 4 questions per call** and gives the user native prev/next navigation across them plus a single summary Submit — that *is* the "one at a time" experience, and it's better than firing a separate card per decision. So:
+   - **Default — batch.** For independent decisions (the common case — they don't depend on each other), print the short prose writeups (Issue + Why) for the group, then fire **one** `AskUserQuestion` carrying them as contract-shaped questions (chunks of ≤4). The user walks them with the widget's own navigation and submits once; the summary Submit recaps their picks.
+   - **Go sequential (separate calls, one decision each) only when** a later decision genuinely depends on the user's answer to an earlier one. Then fire, wait, adapt, fire the next.
+   - **More than 4 decisions:** chunk into successive batches of ≤4.
+   - **Don't label separate calls "Decision N of M."** That promises in-widget pagination that separate calls don't have (the user can't arrow across them, and each card's Submit looks like a phantom extra decision). Within a single batched call the widget numbers the questions for you.
+   - The point isn't one *tool call* per decision — it's that each decision is a distinct, fully-formed choice the user weighs on its own, never a blended wall.
 
 4. **Recap at the end.** Print a simple table of each decision and the choice made. That's the MVP deliverable — see Scope.
 
@@ -67,6 +69,8 @@ Then call `AskUserQuestion` with options whose descriptions follow the contract,
 - Option A — label `Fix to <= (Recommended)` — *Implication:* expired-now tokens are rejected. *Trade-offs:* correct and one line; negligible risk. *Why:* it's the actual bug and cheap to fix.
 - Option B — label `Leave as-is` — *Implication:* the one-second window persists. *Trade-offs:* zero effort now; carries a known auth bug.
 - Option C — label `Fix + add a regression test` — *Implication:* fixes it and guards against recurrence. *Trade-offs:* a bit more work; best durability.
+
+For a set of independent decisions, pass several such questions in a **single** `AskUserQuestion` call (≤4) rather than one call each — the user then navigates the whole set in one widget and submits once. Print each decision's Issue + Why writeup first, then fire the one batched call.
 
 ## Scope (MVP)
 
