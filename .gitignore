@@ -2,6 +2,3 @@
 .env
 .claude/session-logs
 side quests/
-
-# Skill-creator eval scratch (run outputs, transcripts, viewer, feedback) — not part of the skill
-.claude/skills/*-workspace/
