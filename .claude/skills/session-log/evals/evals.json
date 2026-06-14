@@ -1,0 +1,60 @@
+{
+  "skill_name": "session-log",
+  "notes": "v2 format. Run with-skill vs baseline (no skill) subagents, then grade with the workspace grader. eval-4 specifically targets the real-world gap: Claude skipping Learnings / not adding to every relevant section on an incremental update to a content-rich log.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "create-log",
+      "prompt": "Start a session log for today — I'm refactoring the auth module and want to track decisions as we go.",
+      "expected_output": "A new file at ~/.claude/session-logs/<repo>/YYYY-MM-DDTHHMM-<topic>.md (central, outside the repo), v2 format: '# Session Log — <topic>' H1, Started/Session ID/Goal metadata, the required H2/H3 structure, dated by session start.",
+      "files": [],
+      "expectations": [
+        "File named YYYY-MM-DDTHHMM-<topic>.md (T-separated, no colon)",
+        "parse_session_log.py exits 0 (conforming v2 structure)",
+        "Header is '# Session Log — <topic>' with no date in the H1",
+        "Started, Session ID, and a non-empty Goal mentioning the auth refactor are present"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "incremental-update",
+      "prompt": "We just decided to use JWT over server-side sessions, and I caught a bug where the token expiry check used < instead of <=. Update the session log.",
+      "expected_output": "A Decisions entry (Options/Chosen/Why) for JWT-vs-sessions; a Mistakes triplet under Learnings for the off-by-one; an appended timestamped Update block; no thematic duplication into the Update block.",
+      "files": [],
+      "expectations": [
+        "Decisions entry uses Options considered / Chosen / Why, naming sessions as the alternative and JWT as the choice",
+        "A Mistakes & corrections triplet (Symptom/Root cause/Correct approach) under ## Learnings covers the <= bug",
+        "A new ## Update YYYY-MM-DDTHH:MM TZ block is appended in canonical format",
+        "The Update block does not restate the full decision/mistake prose",
+        "parse_session_log.py still exits 0"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "close-audit",
+      "prompt": "Last call — wrap up the session log, I'm done for the day.",
+      "expected_output": "Close-out: completed todos as '- [x] ~~...~~', a final timestamped Update, Learnings subsections populated where the session produced them, updates chronological with no duplicates.",
+      "files": [],
+      "expectations": [
+        "Completed to-dos are '- [x] ~~text~~' (checkbox kept AND struck), not deleted",
+        "A final ## Update block is appended; all updates chronological with no duplicate timestamps",
+        "Learnings subsections are populated where the session produced material (not left empty)",
+        "parse_session_log.py exits 0"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "accumulation-extraction",
+      "prompt": "Update the log — we finally got the Redis cache working. It took way longer than it should have because I kept assuming the bug was in our Redis config when it was actually our serialization layer. I only cracked it after stepping away for coffee and pairing on it with fresh eyes.",
+      "expected_output": "A NON-ENUMERATED update to a content-rich log. The user names no sections explicitly, so the skill must PROACTIVELY extract the implicit learnings — a Mistake (assumed Redis config; was serialization) and a What-worked (step away + fresh-eyes pairing) — into the right Learnings subsections, not merely log 'cache working' in What happened. This isolates the real-world gap: Claude skipping Learnings when the material is implicit. The baseline is expected to log the milestone but skip the Learnings extraction.",
+      "files": ["seed: a content-rich log with an existing decision, mistake, win, user-pref, and one update"],
+      "expectations": [
+        "What happened gained the cache-working milestone",
+        "Mistakes & corrections GAINED a triplet extracting the implicit mis-assumption (Redis config vs serialization) — the key test; baseline tends to skip this",
+        "What worked & what to repeat GAINED an entry (stepping away / fresh-eyes pairing) with 'Why it worked:' on its own line",
+        "A 2nd ## Update block is appended; both updates present and chronological",
+        "No pre-existing content was dropped (existing decision/mistake/win/pref retained); parse_session_log.py exits 0"
+      ]
+    }
+  ]
+}
