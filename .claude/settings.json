@@ -29,6 +29,16 @@
             "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/skills/session-log/scripts/inject_timestamp.sh\""
           }
         ]
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/skills/breakdown-to-decide/hook/contract_hook.py\"",
+            "statusMessage": "Checking decision contract"
+          }
+        ]
       }
     ]
   }

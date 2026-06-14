@@ -1,0 +1,41 @@
+{
+  "skill_name": "breakdown-to-decide",
+  "_note": "This skill's mechanism is AskUserQuestion, which needs a human. Eval runs are non-interactive, so each run is instructed: wherever the skill would call AskUserQuestion, write out the exact question + options (with their Implication / Trade-offs / Why) as markdown instead, so the contract is gradable without a live human.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "code-findings-explicit-walk",
+      "prompt": "I ran a linter + review pass on my auth module and got these 5 issues. Walk me through them one at a time so I can decide what to do on each — don't just fix everything for me:\n1. verifyToken() uses `<` instead of `<=` for the expiry check (off-by-one)\n2. JWT secret is read from env with no fallback or validation\n3. Password hashing uses bcrypt cost factor 8 (low)\n4. The login endpoint has no rate limiting\n5. The session cookie is missing the SameSite attribute",
+      "expected_output": "Presents the 5 issues one at a time, not as a wall. Each is a contract-shaped decision: an Issue + Why-it-matters writeup, then 2-4 options each with an Implication and Trade-offs, with one option marked (Recommended) and a Why. Does not bulk-fix. Does not fabricate extra issues.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "stack-decompose-generality",
+      "prompt": "I'm overwhelmed trying to pick a stack for a side project and I don't know where to start. Can you help me break down the decisions I need to make and lay out my options for each? It's a small web app, I'm solo, I know Python well and a little JavaScript.",
+      "expected_output": "Identifies the distinct decisions (e.g. backend framework, frontend approach, datastore, hosting, auth) rather than dumping one big answer, and walks them one at a time. Each decision is contract-shaped: Issue/context + Why-it-matters, options each with Implication + Trade-offs, a (Recommended) option with Why tuned to a solo Python dev. Tests that the skill generalizes beyond code-review findings.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "auth-hardening-genuine-multiselect",
+      "prompt": "Walk me through some auth-hardening decisions one at a time. The decisions: (1) rate-limiting approach — token bucket vs fixed window vs none; (2) which optional protections to add — account lockout after N failures, MFA, and IP allowlisting for admins (any combination is fine, I may want several); (3) bcrypt cost factor — 10, 12, or 14.",
+      "expected_output": "Walks the 3 decisions one at a time, contract-shaped. Decisions 1 and 3 are single-select with one (Recommended) first. Decision 2 genuinely allows multiple compatible picks, so it should use a multi-select framing — a recommended set, each option still carrying Implication + Trade-offs. Tests correct multi- vs single-select discrimination.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "underspecified-no-format-cue",
+      "prompt": "Ugh, my teammate left this review on my PR and I'm staring at it not knowing what to tackle first: the new endpoint duplicates logic that's already in users.py and orgs.py; process() is 120 lines; there are no tests on the serializer; 86400 is hardcoded in 3 spots; and the error handling swallows exceptions. What do you think?",
+      "expected_output": "Even though the user did NOT ask for a one-at-a-time walk or for options, the skill should induce the contract: break the feedback into separate decisions and present them one at a time, each with Issue + Why-it-matters, options with Implication + Trade-offs, and a (Recommended) + Why — rather than a single wall-of-text answer. This is the key skill-vs-baseline test: the baseline is expected to dump one big response.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "real-spec-review-genesis",
+      "prompt": "Use AskUserQuestion to run through each of these design-review findings one by one. For each, tell me: the issue that was raised, why it's a problem, my options, the trade-offs for each option, and your recommendation.\n\nFindings from a review of my tool's design spec:\n1. The spec says to route deferred items to a backlog, but there's no structured way to mark something as 'deferred' — it would have to guess intent from free text.\n2. Decisions are held only in memory during the flow and written to a file once at the very end, so a long session could lose everything on interruption.\n3. The spec says the tool should 'offer to apply fixes' but never defines how a decision maps to a concrete action, and many items aren't code-fixable.\n4. Output paths are hardcoded to one repo's directories, so the tool breaks if reused elsewhere.\n5. When the items come from earlier in the conversation and there are several candidate sets, nothing confirms which set to work through.\n6. Some items have more than four resolution options, but the picker caps at four, with no rule for which four make the cut.",
+      "expected_output": "This is the real use case that motivated the skill (a design-spec review). Walks the 6 findings one at a time, each contract-shaped: issue + why-it-matters, options each with implication + trade-offs, and a recommendation. Tests the skill on a third domain (design-spec review — not code findings, not life decisions). Should NOT fabricate findings beyond the 6 given.",
+      "files": []
+    }
+  ]
+}

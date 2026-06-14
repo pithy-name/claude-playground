@@ -13,10 +13,15 @@ A personal sandbox for exploring Claude Code features — primarily skills and a
 - `meetgeek-to-md` — user-invocable; converts MeetGeek DOCX transcript exports to clean markdown
 - `session-report` — user-invocable; project-scoped override of the session-report plugin
 - `session-journal` — automatic; 🧪 experimental, superseded by the Session logs workflow below; creates per-session journal entries
+- `breakdown-to-decide` — user-invocable (`/breakdown-to-decide`) + auto-triggers on decision overwhelm; walks a set of decisions one at a time (issue / why / options with implications + trade-offs / recommendation) via `AskUserQuestion`. Ships with a PreToolUse hook (`hook/contract_hook.py`, registered in `.claude/settings.json`, **soft mode** — never blocks) that nudges any `AskUserQuestion` whose options miss the contract. Spec: `plans/2026-06-01-breakdown-to-decide-design.md`.
 
 ## Tools
 
 - `tools/` — standalone HTML tools, each in its own subdirectory. For any third-party tool, retain the upstream LICENSE in its subdirectory and verify license compliance before committing.
+
+## Plans
+
+Design specs for in-progress work live in `plans/` at the repo root, named `YYYY-MM-DD-<topic>-design.md`. A plan is reviewed and approved before the work it describes is built.
 
 ## Session logs
 
