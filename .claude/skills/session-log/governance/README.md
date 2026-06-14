@@ -1,5 +1,7 @@
 # session-log governance
 
+> ⚠️ **Status: UNVETTED (as of 2026-06-13).** This tool has not yet been run or validated. Its tests have not been executed against a real `~/.claude` tree, its GREEN/RED verdict has not been inspected, and `install_schedule.sh` (which registers a weekly launchd job) has **not** been reviewed or run. It shipped to `main` alongside the skill but is **not** part of the skill's vetted, working surface. Do **not** rely on its output or install its schedule until it has been vetted. The skills graduated to global on lived experience, independent of this gate.
+
 A deterministic **GREEN/RED gate** — no LLM, no network — that answers one question:
 
 > Is it safe yet to remove the old session-log guidance from `CLAUDE.md` files and auto-memories?
