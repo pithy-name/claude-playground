@@ -2,3 +2,9 @@
 .env
 .claude/session-logs
 side quests/
+
+# governance reports/history contain absolute paths + PII — never commit them
+# (date-named reports, *report*.md, and the history jsonl; README.md/.py/.sh stay tracked)
+.claude/skills/session-log/governance/[0-9]*.md
+.claude/skills/session-log/governance/*report*.md
+.claude/skills/session-log/governance/*.jsonl
