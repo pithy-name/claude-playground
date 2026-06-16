@@ -1,5 +1,7 @@
 # session-log governance
 
+> ℹ️ **Status: experimental — vetted 2026-06-13.** Test-run and working: its 15 unit tests pass and a read-only `python3 governance.py` (no flags) produces a coherent verdict. As of that run the gate reads **RED** — the skills haven't been dogfooded across enough sessions/repos yet to safely remove the old backup guidance, which is the correct conservative answer, not a failure. Note: `install_schedule.sh` (which registers a weekly launchd job) has **not** been reviewed or installed — don't run it without review. The skills graduated to global on lived experience, independent of this gate.
+
 A deterministic **GREEN/RED gate** — no LLM, no network — that answers one question:
 
 > Is it safe yet to remove the old session-log guidance from `CLAUDE.md` files and auto-memories?
