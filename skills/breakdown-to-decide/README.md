@@ -51,16 +51,17 @@ For now, copying the directory is the only way to get the skill + hook (bundled/
    **TIP (Optional, not recommended):**
       - Want the hook to *block* until each question meets the contract, not just nudge? Set `BTD_HOOK_MODE=strict` in your settings's `env`, sibling to `hooks`. Default is `soft`.
       - Not recommended because this level of detail can easily become overkill.
-      -    ```json
-           {
-             "env": {
-               "BTD_HOOK_MODE": "strict"                                                                                
-             },
-             "hooks": {
-               "PreToolUse": [ ... the breakdown hook ... ]
-             }
-           }
-           ```
+
+   ```json
+   {
+     "env": {
+       "BTD_HOOK_MODE": "strict"
+     },
+     "hooks": {
+       "PreToolUse": [ ... the breakdown hook ... ]
+     }
+   }
+   ```
 
 ## How to use it
 
