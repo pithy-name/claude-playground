@@ -2,6 +2,8 @@
 
 *A Claude Code skill that walks you through a pile of decisions one at a time — each as a clear, structured choice — instead of dumping them all at once.*
 
+**Maturity:** v1.0 · **Type:** User-invocable (`/breakdown-to-decide`) + auto-trigger, with a soft PreToolUse hook
+
 ## What it is
 
 When you're facing several decisions or findings to resolve, this skill makes Claude present them **one at a time**. Each one comes as a structured choice — the issue, why it matters, your options (each with its implications and trade-offs), and a recommendation — captured with Claude Code's `AskUserQuestion` picker. You decide each, then get a recap.
@@ -27,7 +29,7 @@ There's no one-click install yet (bundling as a plugin is future work — see th
 
    That gives you the skill **and** the hook script. (Copying the directory is the only way to get the hook without a plugin.)
 
-2. **(Optional) Turn on the hook** so the contract is enforced on every `AskUserQuestion`. Add this to `settings.json` — `.claude/settings.json` for one project, or `~/.claude/settings.json` for all of them — pointing at wherever you copied the skill:
+2. **(Optional) Turn on the hook** so the contract is enforced on every `AskUserQuestion`. Add this to `settings.json` — `.claude/settings.json` for one project, or `~/.claude/settings.json` for all of them — pointing at wherever you copied the skill. **Merge** into your existing file — add to your `hooks` block if you have one; don't overwrite it:
 
    ```json
    {
@@ -44,7 +46,7 @@ There's no one-click install yet (bundling as a plugin is future work — see th
    }
    ```
 
-   Then run `/hooks` (or restart) so Claude Code loads it. The hook needs `python3`.
+   Then run `/hooks` (or restart) so Claude Code loads it. The hook needs `python3`. **Verify:** `/hooks` should now list a `PreToolUse` → `AskUserQuestion` entry; the next decision card will be contract-checked.
 
 ### Globalize it (use it everywhere)
 

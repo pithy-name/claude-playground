@@ -2,7 +2,7 @@
 
 > A Claude Code skill that keeps a clean, machine-readable **Session Log** for every coding session — so you can run a retro or post-mortem without re-reading the whole transcript.
 
-**Maturity:** Experimental · **Type:** Hybrid (auto-creates at session start via a hook + updates by the skill)
+**Maturity:** v1.0 · **Type:** Hybrid (auto-creates at session start via a hook + updates by the skill)
 
 ---
 
@@ -34,7 +34,7 @@ Logs are written **centrally** to `~/.claude/session-logs/<repo>/` — outside a
 - *One project:* put this folder at `<repo>/.claude/skills/session-log/`.
 - *All projects (globalize):* put it at `~/.claude/skills/session-log/`.
 
-**2. Register the two hooks** in your settings (`.claude/settings.json` for one project, or `~/.claude/settings.json` to globalize). Use `$HOME/...` paths for the global install, or `${CLAUDE_PROJECT_DIR}/...` for a single project:
+**2. Register the two hooks** in your settings (`.claude/settings.json` for one project, or `~/.claude/settings.json` to globalize). Use `$HOME/...` paths for the global install, or `${CLAUDE_PROJECT_DIR}/...` for a single project. **Merge** these into your existing `settings.json` — if you already have a `hooks` block, add to it; don't paste over the whole file:
 
 ```jsonc
 {
@@ -50,7 +50,7 @@ Logs are written **centrally** to `~/.claude/session-logs/<repo>/` — outside a
 }
 ```
 
-Requires `python3` and `bash` (both standard on macOS/Linux). That's it — the next session auto-creates a log.
+Then run `/hooks` (or restart Claude Code) so it loads them. Requires `python3` and `bash` (both standard on macOS/Linux). **Verify:** start a new session — it should create a log at `~/.claude/session-logs/<repo>/<timestamp>-session.md`.
 
 ## How to use
 

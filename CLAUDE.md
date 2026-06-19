@@ -6,14 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A personal sandbox for exploring Claude Code features — primarily skills and automation.
 
-## Active skills
+## Skills
 
-- `gitignore-init` — automatic; runs on first repo exploration; creates `.gitignore` if absent, then delegates to `gitignore-checker`
-- `gitignore-checker` — automatic; runs whenever a `.gitignore` is read/created/edited; ensures `.DS_Store` and `.env` entries are present
+Skills live in `skills/` as a **publishable library** — source to copy or globalize, **not auto-loaded by this repo**. Claude Code only discovers skills under `.claude/skills/` (project) or `~/.claude/skills/` (global), so nothing in `skills/` runs here on its own. Two are installed globally and drive this repo's runtime: `session-log` and `breakdown-to-decide`. Pattern: develop a skill here; run the global (production) copy. The trigger types below describe each skill's behavior **where it is installed**, not in-repo.
+
+- `gitignore-init` — automatic; creates `.gitignore` if absent, then delegates to `gitignore-checker`
+- `gitignore-checker` — automatic; ensures `.DS_Store` and `.env` entries are present in a `.gitignore`
 - `meetgeek-to-md` — user-invocable; converts MeetGeek DOCX transcript exports to clean markdown
 - `session-report` — user-invocable; project-scoped override of the session-report plugin
 - `session-journal` — automatic; 🧪 experimental, superseded by the Session logs workflow below; creates per-session journal entries
-- `breakdown-to-decide` — user-invocable (`/breakdown-to-decide`) + auto-triggers on decision overwhelm; walks a set of decisions one at a time (issue / why / options with implications + trade-offs / recommendation) via `AskUserQuestion`. Ships with a PreToolUse hook (`hook/contract_hook.py`, registered in `.claude/settings.json`, **soft mode** — never blocks) that nudges any `AskUserQuestion` whose options miss the contract. Spec: `plans/2026-06-01-breakdown-to-decide-design.md`.
+- `session-log` — automatic; installed globally; produces the session logs described below
+- `breakdown-to-decide` — user-invocable (`/breakdown-to-decide`) + auto-triggers on decision overwhelm; walks a set of decisions one at a time (issue / why / options with implications + trade-offs / recommendation) via `AskUserQuestion`. Ships a PreToolUse hook (`hook/contract_hook.py`, **soft mode** — never blocks) that nudges any `AskUserQuestion` whose options miss the contract; register it per the skill README (this repo relies on the global install, not a tracked project `.claude/settings.json`). Spec: `plans/2026-06-01-breakdown-to-decide-design.md`.
 
 ## Tools
 
@@ -25,7 +28,7 @@ Design specs for in-progress work live in `plans/` at the repo root, named `YYYY
 
 ## Session logs
 
-Session logs are produced by the `session-log` skill and stored **centrally** at `~/.claude/session-logs/<repo>/` — outside any repo, so they're never a public-repo privacy risk and need no per-project `.gitignore`. ("Session log" is this project's term for what the global default calls "scratchpads.") The repo's `.gitignore` still lists `.claude/session-logs/` as belt-and-suspenders against stray local writes.
+Session logs are produced by the `session-log` skill and stored **centrally** at `~/.claude/session-logs/<repo>/` — outside any repo, so they're never a public-repo privacy risk and need no per-project `.gitignore`. The repo's `.gitignore` lists `.claude/` (which covers `.claude/session-logs/`) as belt-and-suspenders against stray local writes.
 
 ## Workflow
 
