@@ -52,7 +52,7 @@ You don't need to spend option slots on "skip" or "let's discuss" — `AskUserQu
    - **Don't label separate calls "Decision N of M."** That promises in-widget pagination that separate calls don't have (the user can't arrow across them, and each card's Submit looks like a phantom extra decision). Within a single batched call the widget numbers the questions for you.
    - The point isn't one *tool call* per decision — it's that each decision is a distinct, fully-formed choice the user weighs on its own, never a blended wall.
 
-4. **Recap at the end.** Print a simple table of each decision and the choice made. That's the MVP deliverable — see Scope.
+4. **Recap at the end.** Print a simple table of each decision and the choice made. That's the deliverable — see Boundaries.
 
 ## Presenting each decision — example
 
@@ -72,12 +72,6 @@ Then call `AskUserQuestion` with options whose descriptions follow the contract,
 
 For a set of independent decisions, pass several such questions in a **single** `AskUserQuestion` call (≤4) rather than one call each — the user then navigates the whole set in one widget and submits once. Print each decision's Issue + Why writeup first, then fire the one batched call.
 
-## Scope (MVP)
+## Boundaries
 
-Keep the MVP lean — its value is the *presentation*, not bookkeeping:
-- **In scope:** gathering the set, the one-at-a-time walk, the contract-shaped questions, and a simple end-of-walk recap printed in chat.
-- **Out of scope (deliberately, for now):** persisting decisions to a file, routing deferrals to a backlog, and acting on the decisions (applying fixes). These are intentionally deferred — don't build them into this walk. If the user wants to act on a choice, that's a separate, explicitly-confirmed step.
-
-## Why this skill exists
-
-Decision fatigue is real: a wall of ten findings gets a worse response than the same ten taken one at a time, each with a clear recommendation. The contract (implication + trade-offs + a reasoned recommendation) front-loads the thinking so the user can make a real call quickly. Sequencing keeps them oriented. That's the entire bet — honor it and the skill works.
+Deliver only the in-chat walk + end recap. Do **not** persist decisions to a file, route deferrals to a backlog, or act on the choices (apply fixes) — out of scope. If the user wants to act on a choice, that's a separate, explicitly-confirmed step.
