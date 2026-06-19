@@ -20,3 +20,4 @@ Backlog for the `claude-playground` sandbox. Active in-flight work lives in sess
 
 - [x] ~~Delete merged local branches~~ — done 2026-06-01 (6 squash-merged branches removed via `gh pr`-verified status)
 - [ ] Re-sync repo skill edits to the global copies — `skills/session-log` + `skills/breakdown-to-decide` README maturity (→ v1.0) and hardened hook-setup docs diverged from `~/.claude/skills/` during the top-level restructure (doc-only; SKILL.md + hooks unchanged, so runtime is unaffected). Re-copy after #11 merges.
+- [x] Update CLAUDE.md to be more public-facing 

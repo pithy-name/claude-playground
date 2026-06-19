@@ -6,11 +6,11 @@ A personal sandbox for building with [Claude Code](https://claude.ai/code).
 
 **Ready to use:**
 
-| Skill | Invocation | Maturity | Description |
-|-------|------------|----------|-------------|
-| [`session-log`](skills/session-log/) | Automatic | v1.0 | Per-session Session Log — what happened / decided / went wrong / learned — stored centrally outside any repo. Ships SessionStart + PreToolUse hooks (set up per its README) and a governance check. |
-| [`breakdown-to-decide`](skills/breakdown-to-decide/) | `/breakdown-to-decide` + auto | v1.0 | Walks decisions one at a time — issue / why / options + trade-offs / recommendation — via `AskUserQuestion`. Ships a soft PreToolUse contract hook (set up per its README). |
-| [`meetgeek-to-md`](skills/meetgeek-to-md/) | `/meetgeek-to-md <path>` | v0.1 | Converts a MeetGeek DOCX transcript to clean markdown with corrected speaker attribution and Key Takeaways. Early — assumes MeetGeek's exact export format. |
+| Skill                                                | Invocation                    | Maturity   | Description                                                                                                                                                                                         |
+| ---------------------------------------------------- | ----------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`session-log`](skills/session-log/)                 | Automatic                     | v1.0       | Per-session Session Log — what happened / decided / went wrong / learned — stored centrally outside any repo. Ships SessionStart + PreToolUse hooks (set up per its README) and a governance check. |
+| [`breakdown-to-decide`](skills/breakdown-to-decide/) | `/breakdown-to-decide` + auto | v1.0       | Walks decisions one at a time — issue / why / options + trade-offs / recommendation — via `AskUserQuestion`. Ships a soft PreToolUse contract hook (set up per its README).                         |
+| [`meetgeek-to-md`](skills/meetgeek-to-md/)           | `/meetgeek-to-md <path>`      | v0.1 (MVP) | Converts a MeetGeek DOCX transcript to clean markdown with corrected speaker attribution and Key Takeaways. Early — assumes MeetGeek's exact export format.                                         |
 
 **Experimental — playground, not ready to rely on:**
 

@@ -3,7 +3,7 @@
 Converts a MeetGeek DOCX transcript export into a clean, readable markdown file. This is a Claude Code skill — invoking it via `/meetgeek-to-md` runs a multi-step automated process defined in [SKILL.md](SKILL.md).
 
 **Caveat emptor**
-> **Status:** v0.1
+> **Status:** v0.1 (MVP)
 > **Works with:** MeetGeek DOCX exports only
 > **Key Takeaways are AI-generated** — not extracted verbatim from the transcript
 > **Attribution is best-effort** — verify against source audio for high-stakes records
